@@ -1,11 +1,301 @@
 <!DOCTYPE html>
 <html lang="de">
-<head>
-<meta charset="UTF-8">
-<title>Temple of Logic – Schüler</title>
-</head>
-<body>
-<h2>Schülerbereich</h2>
-<p>Hier sieht der Schüler seine XP, Missionen usw.</p>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Temple of Logic – Schüler:in</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body class="page page--student">
+    <div class="page__backdrop"></div>
+    <header class="topbar">
+      <h1>Temple of Logic</h1>
+      <div class="topbar__actions">
+        <button id="logoutBtn" class="btn btn--ghost">Logout</button>
+      </div>
+    </header>
+    <main class="student-dashboard">
+      <section class="card profile-card">
+        <div class="profile-card__character" id="characterContainer"></div>
+        <div class="profile-card__info" id="profileInfo"></div>
+      </section>
+
+      <section class="card level-card" id="levelSection"></section>
+
+      <section class="card traits-card">
+        <div>
+          <h2>Charaktereigenschaften</h2>
+          <ul id="traitList" class="pill-list"></ul>
+        </div>
+        <div>
+          <h2>Ausrüstung</h2>
+          <ul id="equipmentList" class="pill-list"></ul>
+        </div>
+      </section>
+
+      <section class="card carousel-card">
+        <header class="section-header">
+          <h2>Missionen</h2>
+          <p>Hier findest du alle aktuellen Herausforderungen.</p>
+        </header>
+        <div class="carousel">
+          <button class="carousel__btn" data-action="prev" aria-label="Vorherige Mission">◀</button>
+          <div class="carousel__track" id="missionTrack"></div>
+          <button class="carousel__btn" data-action="next" aria-label="Nächste Mission">▶</button>
+        </div>
+      </section>
+
+      <section class="card carousel-card">
+        <header class="section-header">
+          <h2>Bonuskarten</h2>
+          <p>Löse deine verdienten Belohnungen ein.</p>
+        </header>
+        <div class="carousel">
+          <button class="carousel__btn" data-action="prev" aria-label="Vorherige Bonuskarte">◀</button>
+          <div class="carousel__track" id="bonusTrack"></div>
+          <button class="carousel__btn" data-action="next" aria-label="Nächste Bonuskarte">▶</button>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const state = {
+        profile: null,
+        missions: [],
+        bonusCards: [],
+      };
+
+      async function fetchSession() {
+        const res = await fetch("/api/session");
+        const data = await res.json();
+        if (!data.authenticated || data.user.role !== "student") {
+          window.location.href = "/login";
+        }
+      }
+
+      document.getElementById("logoutBtn").addEventListener("click", async () => {
+        await fetch("/api/logout", { method: "POST" });
+        window.location.href = "/login";
+      });
+
+      function renderCharacter() {
+        const container = document.getElementById("characterContainer");
+        container.innerHTML = "";
+        const { character } = state.profile;
+        const figure = document.createElement("figure");
+        figure.className = "character-card";
+        figure.innerHTML = `
+          <div class="character-card__image">
+            ${character?.image_path ? `<img src="${character.image_path}" alt="${character.name}" />` : '<div class="character-card__placeholder">?</div>'}
+          </div>
+          <figcaption>${character ? character.name : "Mysteriöser Mentor"}</figcaption>`;
+        container.appendChild(figure);
+      }
+
+      function renderProfileInfo() {
+        const container = document.getElementById("profileInfo");
+        const { profile } = state;
+        container.innerHTML = `
+          <h2>${profile.name}</h2>
+          <p class="xp-value">Aktuelle XP: <strong>${profile.xp}</strong></p>
+          <p class="xp-value">Höchste XP: <strong>${profile.highestXp}</strong></p>`;
+      }
+
+      function renderLevel() {
+        const section = document.getElementById("levelSection");
+        const { profile } = state;
+        const levels = profile.levels;
+        const current = profile.level;
+        const next = profile.nextLevel;
+        const xpReference = profile.highestXp;
+        const maxThreshold = levels.length
+          ? levels[levels.length - 1].xp_threshold
+          : Math.max(xpReference, 1);
+        const progress = Math.min((xpReference / Math.max(maxThreshold, 1)) * 100, 100);
+
+        const markers = levels
+          .map(
+            (lvl) => `
+              <div class="level-marker ${lvl.id === current.id ? "is-active" : ""}">
+                <span>${lvl.title}</span>
+                <small>${lvl.xp_threshold} XP</small>
+              </div>`
+          )
+          .join("");
+
+        section.innerHTML = `
+          <h2>Dein Level</h2>
+          <div class="level-progress">
+            <div class="level-progress__bar" style="width: ${progress}%"></div>
+          </div>
+          <div class="level-labels">${markers}</div>
+          <p class="level-hint">${
+            next
+              ? `Noch ${Math.max(next.xp_threshold - xpReference, 0)} XP bis ${next.title}`
+              : "Du hast das höchste Level erreicht!"
+          }</p>`;
+      }
+
+      function renderTraits() {
+        const traitList = document.getElementById("traitList");
+        const equipmentList = document.getElementById("equipmentList");
+        traitList.innerHTML = "";
+        equipmentList.innerHTML = "";
+        state.profile.traits.forEach((trait) => {
+          const li = document.createElement("li");
+          li.textContent = trait;
+          traitList.appendChild(li);
+        });
+        state.profile.equipment.forEach((item) => {
+          const li = document.createElement("li");
+          li.textContent = item;
+          equipmentList.appendChild(li);
+        });
+      }
+
+      function createCarouselHandlers(track) {
+        const container = track.closest(".carousel");
+        if (!container || container.dataset.bound === "true") return;
+        const prev = container.querySelector('[data-action="prev"]');
+        const next = container.querySelector('[data-action="next"]');
+        const scrollAmount = () => track.clientWidth * 0.8;
+        prev?.addEventListener("click", () => {
+          track.scrollBy({ left: -scrollAmount(), behavior: "smooth" });
+        });
+        next?.addEventListener("click", () => {
+          track.scrollBy({ left: scrollAmount(), behavior: "smooth" });
+        });
+        container.dataset.bound = "true";
+      }
+
+      function renderMissions() {
+        const track = document.getElementById("missionTrack");
+        track.innerHTML = "";
+        if (!state.missions.length) {
+          track.innerHTML = "<p class='empty'>Noch keine Missionen verfügbar.</p>";
+          return;
+        }
+        state.missions.forEach((mission) => {
+          const card = document.createElement("article");
+          card.className = "carousel-card__item";
+          card.innerHTML = `
+            <div class="mission-card">
+              ${mission.image_path ? `<img src="${mission.image_path}" alt="${mission.title}" />` : ""}
+              <div class="mission-card__body">
+                <h3>${mission.title}</h3>
+                <p>${mission.description || "Keine Beschreibung"}</p>
+                <p class="mission-card__xp">${mission.xp_value} XP</p>
+                ${
+                  mission.allow_upload
+                    ? `<label class="upload-btn">
+                        <input type="file" accept="image/*" data-mission="${mission.id}" hidden />
+                        <span>Bild hochladen</span>
+                      </label>`
+                    : ""
+                }
+              </div>
+            </div>`;
+          track.appendChild(card);
+        });
+        createCarouselHandlers(track);
+        track.querySelectorAll("input[type='file']").forEach((input) => {
+          input.addEventListener("change", handleMissionUpload);
+        });
+      }
+
+      async function handleMissionUpload(event) {
+        const fileInput = event.target;
+        const missionId = fileInput.dataset.mission;
+        if (!fileInput.files.length) return;
+        const formData = new FormData();
+        formData.append("image", fileInput.files[0]);
+        const res = await fetch(`/api/student/missions/${missionId}/upload`, {
+          method: "POST",
+          body: formData,
+        });
+        if (res.ok) {
+          fileInput.value = "";
+          alert("Upload erfolgreich! Danke für dein Bild.");
+        } else {
+          const data = await res.json();
+          alert(data.error || "Upload fehlgeschlagen");
+        }
+      }
+
+      function renderBonusCards() {
+        const track = document.getElementById("bonusTrack");
+        track.innerHTML = "";
+        if (!state.bonusCards.length) {
+          track.innerHTML = "<p class='empty'>Noch keine Bonuskarten verfügbar.</p>";
+          return;
+        }
+        state.bonusCards.forEach((card) => {
+          const article = document.createElement("article");
+          article.className = `carousel-card__item ${card.unlocked ? "" : "is-locked"}`;
+          article.innerHTML = `
+            <div class="bonus-card">
+              ${card.image_path ? `<img src="${card.image_path}" alt="${card.title}" />` : ""}
+              <div class="bonus-card__body">
+                <h3>${card.title}</h3>
+                <p>${card.description || "Keine Beschreibung"}</p>
+                <p class="bonus-card__xp">Kosten: ${card.xp_cost} XP</p>
+                <button class="btn btn--primary" data-id="${card.id}" ${
+                  card.canRedeem ? "" : "disabled"
+                }>${card.canRedeem ? "Einlösen" : card.unlocked ? "Nicht genug XP" : "Noch gesperrt"}</button>
+              </div>
+            </div>`;
+          const button = article.querySelector("button");
+          if (button && !button.disabled) {
+            button.addEventListener("click", () => redeemBonus(card.id));
+          }
+          track.appendChild(article);
+        });
+        createCarouselHandlers(track);
+      }
+
+      async function redeemBonus(id) {
+        const res = await fetch(`/api/student/bonus-cards/${id}/redeem`, {
+          method: "POST",
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          alert(data.error || "Einlösen fehlgeschlagen");
+          return;
+        }
+        state.profile.xp = data.xp;
+        await Promise.all([loadProfile(), loadBonusCards()]);
+        renderProfileInfo();
+        renderLevel();
+      }
+
+      async function loadProfile() {
+        const res = await fetch("/api/student/dashboard");
+        state.profile = await res.json();
+        renderCharacter();
+        renderProfileInfo();
+        renderLevel();
+        renderTraits();
+      }
+
+      async function loadMissions() {
+        const res = await fetch("/api/student/missions");
+        state.missions = await res.json();
+        renderMissions();
+      }
+
+      async function loadBonusCards() {
+        const res = await fetch("/api/student/bonus-cards");
+        state.bonusCards = await res.json();
+        renderBonusCards();
+      }
+
+      async function init() {
+        await fetchSession();
+        await loadProfile();
+        await Promise.all([loadMissions(), loadBonusCards()]);
+      }
+
+      init();
+    </script>
+  </body>
 </html>
