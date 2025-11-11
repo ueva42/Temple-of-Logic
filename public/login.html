@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Temple of Logic – Login</title>
+</head>
+<body>
+<h2>Login</h2>
+<form id="loginForm">
+  <input name="name" placeholder="Name"><br>
+  <input type="password" name="password" placeholder="Passwort"><br>
+  <button type="submit">Login</button>
+</form>
+
+<script>
+document.getElementById("loginForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const formData = Object.fromEntries(new FormData(e.target));
+  const res = await fetch("/api/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(formData)
+  });
+  const data = await res.json();
+  if (data.role === "admin") location.href = "/admin";
+  else if (data.role === "student") location.href = "/student";
+  else alert(data.error || "Login fehlgeschlagen");
+});
+</script>
+</body>
+</html>
