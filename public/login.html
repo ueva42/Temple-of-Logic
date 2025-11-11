@@ -11,6 +11,49 @@
   <input type="password" name="password" placeholder="Passwort"><br>
   <button type="submit">Login</button>
 </form>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Temple of Logic – Login</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body class="page page--login">
+    <div class="nebula"></div>
+    <main class="auth-card">
+      <header class="auth-card__header">
+        <h1>Temple of Logic</h1>
+        <p>Betritt den Tempel und sammle XP auf deiner Reise.</p>
+      </header>
+      <form id="loginForm" class="auth-card__form">
+        <label class="form-field">
+          <span>Nutzername</span>
+          <input name="name" type="text" required autocomplete="username" />
+        </label>
+        <label class="form-field">
+          <span>Passwort</span>
+          <input
+            name="password"
+            type="password"
+            required
+            autocomplete="current-password"
+          />
+        </label>
+        <button type="submit" class="btn btn--primary">Login</button>
+        <p id="loginError" class="form-error" aria-live="polite"></p>
+      </form>
+    </main>
+    <script>
+      async function ensureLoggedOut() {
+        const response = await fetch("/api/session");
+        const session = await response.json();
+        if (session.authenticated) {
+          if (session.user.role === "admin") {
+            window.location.href = "/admin";
+          } else if (session.user.role === "student") {
+            window.location.href = "/student";
+          }
+        }
+      }
 
 <script>
 document.getElementById("loginForm").addEventListener("submit", async e => {
@@ -28,4 +71,34 @@ document.getElementById("loginForm").addEventListener("submit", async e => {
 });
 </script>
 </body>
+      ensureLoggedOut();
+
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const errorEl = document.getElementById("loginError");
+          errorEl.textContent = "";
+          const formData = Object.fromEntries(new FormData(event.target));
+
+          try {
+            const res = await fetch("/api/login", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(formData),
+            });
+
+            const data = await res.json();
+            if (!res.ok) {
+              throw new Error(data.error || "Unbekannter Fehler");
+            }
+            if (data.role === "admin") window.location.href = "/admin";
+            else if (data.role === "student") window.location.href = "/student";
+            else throw new Error("Rolle unbekannt");
+          } catch (err) {
+            errorEl.textContent = err.message;
+          }
+        });
+    </script>
+  </body>
 </html>

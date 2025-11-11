@@ -8,4 +8,645 @@
 <h2>Adminbereich</h2>
 <p>Hier kommen später Klassen, XP-Vergabe, Bonuskarten usw.</p>
 </body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Temple of Logic – Adminbereich</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body class="page page--admin">
+    <div class="page__backdrop"></div>
+    <header class="topbar">
+      <h1>Temple of Logic – Verwaltung</h1>
+      <div class="topbar__actions">
+        <span id="activeClassLabel" class="badge">Keine aktive Klasse</span>
+        <button id="logoutBtn" class="btn btn--ghost">Logout</button>
+      </div>
+    </header>
+    <div class="admin-layout">
+      <nav class="admin-nav">
+        <button class="admin-nav__item is-active" data-target="classes">Klassen</button>
+        <button class="admin-nav__item" data-target="students">Schüler:innen</button>
+        <button class="admin-nav__item" data-target="xp">XP-Vergabe</button>
+        <button class="admin-nav__item" data-target="missions">Missionen</button>
+        <button class="admin-nav__item" data-target="bonus">Bonuskarten</button>
+        <button class="admin-nav__item" data-target="characters">Charaktere</button>
+        <button class="admin-nav__item" data-target="levels">Level</button>
+        <button class="admin-nav__item" data-target="uploads">Uploads</button>
+      </nav>
+      <main class="admin-content">
+        <section class="admin-section is-active" data-section="classes">
+          <header class="section-header">
+            <h2>Klassen</h2>
+            <p>Lege neue Klassen an und aktiviere die aktuelle Klasse.</p>
+          </header>
+          <form id="classForm" class="card form-inline">
+            <label class="form-field">
+              <span>Klassenname</span>
+              <input name="name" type="text" required />
+            </label>
+            <button type="submit" class="btn btn--primary">Klasse anlegen</button>
+          </form>
+          <ul id="classList" class="card-list"></ul>
+        </section>
+
+        <section class="admin-section" data-section="students">
+          <header class="section-header">
+            <h2>Schüler:innen</h2>
+            <p>Verwalte alle Lernenden in der aktiven Klasse.</p>
+          </header>
+          <form id="studentForm" class="card form-grid">
+            <label class="form-field">
+              <span>Name</span>
+              <input name="name" type="text" required />
+            </label>
+            <label class="form-field">
+              <span>Passwort</span>
+              <input name="password" type="text" required />
+            </label>
+            <button type="submit" class="btn btn--primary">Schüler:in anlegen</button>
+            <p class="form-hint">
+              Tipp: Gib das Passwort an die Schüler:in weiter. Es kann später durch die
+              Administration geändert werden.
+            </p>
+          </form>
+          <div class="card">
+            <h3>Aktive Klasse</h3>
+            <div id="studentList" class="table"></div>
+          </div>
+        </section>
+
+        <section class="admin-section" data-section="xp">
+          <header class="section-header">
+            <h2>XP-Vergabe</h2>
+            <p>Verteile Erfahrungspunkte an einzelne Schüler:innen oder an die ganze Klasse.</p>
+          </header>
+          <div class="card xp-panel">
+            <div class="xp-panel__students">
+              <div class="xp-panel__header">
+                <h3>Schüler:innen</h3>
+                <button id="xpSelectAll" class="btn btn--ghost">Alle auswählen</button>
+              </div>
+              <ul id="xpStudentList" class="checklist"></ul>
+            </div>
+            <form id="xpForm" class="xp-panel__form">
+              <label class="form-field">
+                <span>Freier XP-Betrag</span>
+                <input name="amount" type="number" min="0" placeholder="z.B. 25" />
+              </label>
+              <label class="form-field">
+                <span>Begründung</span>
+                <input name="reason" type="text" placeholder="Optional" />
+              </label>
+              <label class="form-field">
+                <span>Mission</span>
+                <select name="missionId">
+                  <option value="">Keine Mission</option>
+                </select>
+              </label>
+              <label class="form-checkbox">
+                <input type="checkbox" name="applyToAll" />
+                <span>XP an gesamte aktive Klasse vergeben</span>
+              </label>
+              <button type="submit" class="btn btn--primary">XP vergeben</button>
+              <p id="xpStatus" class="form-hint" aria-live="polite"></p>
+            </form>
+          </div>
+        </section>
+
+        <section class="admin-section" data-section="missions">
+          <header class="section-header">
+            <h2>Missionen</h2>
+            <p>Missionen informieren die Schüler:innen und können optionale Uploads enthalten.</p>
+          </header>
+          <form id="missionForm" class="card form-grid" enctype="multipart/form-data">
+            <label class="form-field">
+              <span>Titel</span>
+              <input name="title" type="text" required />
+            </label>
+            <label class="form-field">
+              <span>Beschreibung</span>
+              <textarea name="description" rows="2" placeholder="Optional"></textarea>
+            </label>
+            <label class="form-field">
+              <span>XP</span>
+              <input name="xp_value" type="number" min="1" required />
+            </label>
+            <label class="form-field">
+              <span>Bild</span>
+              <input name="image" type="file" accept="image/*" />
+            </label>
+            <label class="form-checkbox">
+              <input type="checkbox" name="allow_upload" />
+              <span>Schüler:innen dürfen Bilder hochladen</span>
+            </label>
+            <button type="submit" class="btn btn--primary">Mission anlegen</button>
+          </form>
+          <div id="missionList" class="card-grid"></div>
+        </section>
+
+        <section class="admin-section" data-section="bonus">
+          <header class="section-header">
+            <h2>Bonuskarten</h2>
+            <p>Belohnungen, die bei ausreichenden XP eingelöst werden können.</p>
+          </header>
+          <form id="bonusForm" class="card form-grid" enctype="multipart/form-data">
+            <label class="form-field">
+              <span>Titel</span>
+              <input name="title" type="text" required />
+            </label>
+            <label class="form-field">
+              <span>Beschreibung</span>
+              <textarea name="description" rows="2" placeholder="Optional"></textarea>
+            </label>
+            <label class="form-field">
+              <span>XP-Kosten</span>
+              <input name="xp_cost" type="number" min="1" required />
+            </label>
+            <label class="form-field">
+              <span>Bild</span>
+              <input name="image" type="file" accept="image/*" />
+            </label>
+            <button type="submit" class="btn btn--primary">Bonuskarte anlegen</button>
+          </form>
+          <div id="bonusList" class="card-grid"></div>
+        </section>
+
+        <section class="admin-section" data-section="characters">
+          <header class="section-header">
+            <h2>Charaktere</h2>
+            <p>Diese Charaktere werden zufällig den Schüler:innen beim ersten Login zugewiesen.</p>
+          </header>
+          <form id="characterForm" class="card form-grid" enctype="multipart/form-data">
+            <label class="form-field">
+              <span>Name</span>
+              <input name="name" type="text" required />
+            </label>
+            <label class="form-field">
+              <span>Bild</span>
+              <input name="image" type="file" accept="image/*" />
+            </label>
+            <button type="submit" class="btn btn--primary">Charakter anlegen</button>
+          </form>
+          <div id="characterList" class="card-grid"></div>
+        </section>
+
+        <section class="admin-section" data-section="levels">
+          <header class="section-header">
+            <h2>Level</h2>
+            <p>Definiere Meilensteine, die auf dem Levelbalken sichtbar sind.</p>
+          </header>
+          <form id="levelForm" class="card form-grid">
+            <label class="form-field">
+              <span>Levelname</span>
+              <input name="title" type="text" required />
+            </label>
+            <label class="form-field">
+              <span>XP-Schwelle</span>
+              <input name="xp_threshold" type="number" min="0" required />
+            </label>
+            <button type="submit" class="btn btn--primary">Level anlegen</button>
+          </form>
+          <div id="levelList" class="card-list"></div>
+        </section>
+
+        <section class="admin-section" data-section="uploads">
+          <header class="section-header">
+            <h2>Mission Uploads</h2>
+            <p>Prüfe und lösche eingereichte Bilder der Schüler:innen.</p>
+          </header>
+          <div id="uploadList" class="card-grid"></div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const state = {
+        classes: [],
+        students: [],
+        missions: [],
+        bonusCards: [],
+        characters: [],
+        levels: [],
+        uploads: [],
+        activeClass: null,
+      };
+
+      const navButtons = document.querySelectorAll(".admin-nav__item");
+      const sections = document.querySelectorAll(".admin-section");
+
+      navButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const target = btn.dataset.target;
+          navButtons.forEach((b) => b.classList.toggle("is-active", b === btn));
+          sections.forEach((section) =>
+            section.classList.toggle(
+              "is-active",
+              section.dataset.section === target
+            )
+          );
+        });
+      });
+
+      async function fetchSession() {
+        const res = await fetch("/api/session");
+        const data = await res.json();
+        if (!data.authenticated || data.user.role !== "admin") {
+          window.location.href = "/login";
+        }
+      }
+
+      function renderActiveClass() {
+        const label = document.getElementById("activeClassLabel");
+        if (!state.activeClass) {
+          label.textContent = "Keine aktive Klasse";
+          label.classList.remove("badge--success");
+        } else {
+          label.textContent = `Aktive Klasse: ${state.activeClass.name}`;
+          label.classList.add("badge--success");
+        }
+      }
+
+      function renderClasses() {
+        const list = document.getElementById("classList");
+        list.innerHTML = "";
+        if (!state.classes.length) {
+          list.innerHTML = '<li class="empty">Noch keine Klassen</li>';
+          return;
+        }
+        state.classes.forEach((cls) => {
+          const li = document.createElement("li");
+          li.className = "card-list__item";
+          li.innerHTML = `
+            <div>
+              <h3>${cls.name}</h3>
+              <p>${cls.is_active ? "Aktiv" : "Inaktiv"}</p>
+            </div>
+            <div class="actions">
+              <button data-id="${cls.id}" class="btn btn--ghost">Aktivieren</button>
+            </div>`;
+          li.querySelector("button").addEventListener("click", () => activateClass(cls.id));
+          if (cls.is_active) li.classList.add("is-active");
+          list.appendChild(li);
+        });
+      }
+
+      function renderStudents() {
+        const container = document.getElementById("studentList");
+        if (!state.activeClass) {
+          container.innerHTML = "<p class='empty'>Keine aktive Klasse ausgewählt.</p>";
+          return;
+        }
+        if (!state.students.length) {
+          container.innerHTML = "<p class='empty'>Noch keine Schüler:innen.</p>";
+          return;
+        }
+        const rows = state.students
+          .map(
+            (student) => `
+              <div class="table__row">
+                <div>
+                  <strong>${student.name}</strong>
+                  <small>${student.xp} XP | Höchstwert ${student.highestXp}</small>
+                </div>
+              </div>`
+          )
+          .join("");
+        container.innerHTML = rows;
+      }
+
+      function renderXpStudents() {
+        const list = document.getElementById("xpStudentList");
+        list.innerHTML = "";
+        if (!state.students.length) {
+          list.innerHTML = '<li class="empty">Keine Schüler:innen verfügbar</li>';
+          return;
+        }
+        state.students.forEach((student) => {
+          const li = document.createElement("li");
+          li.className = "checklist__item";
+          li.innerHTML = `
+            <label>
+              <input type="checkbox" value="${student.id}" />
+              <span>
+                <strong>${student.name}</strong>
+                <small>${student.xp} XP</small>
+              </span>
+            </label>`;
+          list.appendChild(li);
+        });
+      }
+
+      function renderMissionOptions() {
+        const select = document.querySelector('#xpForm select[name="missionId"]');
+        select.innerHTML = '<option value="">Keine Mission</option>';
+        state.missions.forEach((mission) => {
+          const option = document.createElement("option");
+          option.value = mission.id;
+          option.textContent = `${mission.title} (+${mission.xp_value} XP)`;
+          select.appendChild(option);
+        });
+      }
+
+      function renderMissions() {
+        const container = document.getElementById("missionList");
+        container.innerHTML = "";
+        if (!state.missions.length) {
+          container.innerHTML = "<p class='empty'>Noch keine Missionen.</p>";
+          return;
+        }
+        state.missions.forEach((mission) => {
+          const card = document.createElement("article");
+          card.className = "card card--media";
+          card.innerHTML = `
+            ${mission.image_path ? `<img src="${mission.image_path}" alt="${mission.title}" />` : ""}
+            <div>
+              <h3>${mission.title}</h3>
+              <p>${mission.description || "Keine Beschreibung"}</p>
+              <p><strong>${mission.xp_value} XP</strong></p>
+              <p>${mission.allow_upload ? "Uploads erlaubt" : "Nur Information"}</p>
+            </div>`;
+          container.appendChild(card);
+        });
+      }
+
+      function renderBonusCards() {
+        const container = document.getElementById("bonusList");
+        container.innerHTML = "";
+        if (!state.bonusCards.length) {
+          container.innerHTML = "<p class='empty'>Noch keine Bonuskarten.</p>";
+          return;
+        }
+        state.bonusCards.forEach((card) => {
+          const article = document.createElement("article");
+          article.className = "card card--media";
+          article.innerHTML = `
+            ${card.image_path ? `<img src="${card.image_path}" alt="${card.title}" />` : ""}
+            <div>
+              <h3>${card.title}</h3>
+              <p>${card.description || "Keine Beschreibung"}</p>
+              <p><strong>Kosten: ${card.xp_cost} XP</strong></p>
+            </div>`;
+          container.appendChild(article);
+        });
+      }
+
+      function renderCharacters() {
+        const container = document.getElementById("characterList");
+        container.innerHTML = "";
+        if (!state.characters.length) {
+          container.innerHTML = "<p class='empty'>Noch keine Charaktere.</p>";
+          return;
+        }
+        state.characters.forEach((character) => {
+          const article = document.createElement("article");
+          article.className = "card card--media";
+          article.innerHTML = `
+            ${character.image_path ? `<img src="${character.image_path}" alt="${character.name}" />` : ""}
+            <div>
+              <h3>${character.name}</h3>
+            </div>`;
+          container.appendChild(article);
+        });
+      }
+
+      function renderLevels() {
+        const container = document.getElementById("levelList");
+        container.innerHTML = "";
+        if (!state.levels.length) {
+          container.innerHTML = "<li class='empty'>Noch keine Level.</li>";
+          return;
+        }
+        state.levels.forEach((level) => {
+          const li = document.createElement("li");
+          li.className = "card-list__item";
+          li.innerHTML = `
+            <div>
+              <h3>${level.title}</h3>
+              <p>${level.xp_threshold} XP</p>
+            </div>`;
+          container.appendChild(li);
+        });
+      }
+
+      function renderUploads() {
+        const container = document.getElementById("uploadList");
+        container.innerHTML = "";
+        if (!state.uploads.length) {
+          container.innerHTML = "<p class='empty'>Keine Uploads vorhanden.</p>";
+          return;
+        }
+        state.uploads.forEach((upload) => {
+          const article = document.createElement("article");
+          article.className = "card card--media card--upload";
+          article.innerHTML = `
+            ${upload.file_path ? `<img src="${upload.file_path}" alt="${upload.student_name}" />` : ""}
+            <div>
+              <h3>${upload.student_name}</h3>
+              <p>${upload.mission_title}</p>
+              <p class="meta">${new Date(upload.created_at).toLocaleString("de-DE")}</p>
+              <button class="btn btn--danger" data-id="${upload.id}">Löschen</button>
+            </div>`;
+          article.querySelector("button").addEventListener("click", () => deleteUpload(upload.id));
+          container.appendChild(article);
+        });
+      }
+
+      async function loadClasses() {
+        const res = await fetch("/api/admin/classes");
+        state.classes = await res.json();
+        renderClasses();
+      }
+
+      async function loadActiveClass() {
+        const res = await fetch("/api/admin/classes/active");
+        state.activeClass = await res.json();
+        renderActiveClass();
+      }
+
+      async function loadStudents() {
+        const res = await fetch("/api/admin/students");
+        state.students = await res.json();
+        renderStudents();
+        renderXpStudents();
+      }
+
+      async function loadMissions() {
+        const res = await fetch("/api/admin/missions");
+        state.missions = await res.json();
+        renderMissionOptions();
+        renderMissions();
+      }
+
+      async function loadBonusCards() {
+        const res = await fetch("/api/admin/bonus-cards");
+        state.bonusCards = await res.json();
+        renderBonusCards();
+      }
+
+      async function loadCharacters() {
+        const res = await fetch("/api/admin/characters");
+        state.characters = await res.json();
+        renderCharacters();
+      }
+
+      async function loadLevels() {
+        const res = await fetch("/api/admin/levels");
+        state.levels = await res.json();
+        renderLevels();
+      }
+
+      async function loadUploads() {
+        const res = await fetch("/api/admin/mission-uploads");
+        state.uploads = await res.json();
+        renderUploads();
+      }
+
+      async function activateClass(id) {
+        const res = await fetch(`/api/admin/classes/${id}/activate`, {
+          method: "PATCH",
+        });
+        if (res.ok) {
+          await Promise.all([loadClasses(), loadActiveClass(), loadStudents()]);
+        }
+      }
+
+      async function deleteUpload(id) {
+        const res = await fetch(`/api/admin/mission-uploads/${id}`, {
+          method: "DELETE",
+        });
+        if (res.ok) {
+          loadUploads();
+        }
+      }
+
+      document.getElementById("logoutBtn").addEventListener("click", async () => {
+        await fetch("/api/logout", { method: "POST" });
+        window.location.href = "/login";
+      });
+
+      document.getElementById("classForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const formData = Object.fromEntries(new FormData(event.target));
+        const res = await fetch("/api/admin/classes", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        });
+        if (res.ok) {
+          event.target.reset();
+          await loadClasses();
+        }
+      });
+
+      document
+        .getElementById("studentForm")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const formData = Object.fromEntries(new FormData(event.target));
+          const res = await fetch("/api/admin/students", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData),
+          });
+          if (res.ok) {
+            event.target.reset();
+            await loadStudents();
+          }
+        });
+
+      document.getElementById("xpSelectAll").addEventListener("click", () => {
+        const checkboxes = document.querySelectorAll("#xpStudentList input[type='checkbox']");
+        const shouldSelectAll = Array.from(checkboxes).some((c) => !c.checked);
+        checkboxes.forEach((cb) => (cb.checked = shouldSelectAll));
+      });
+
+      document.getElementById("xpForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const statusEl = document.getElementById("xpStatus");
+        statusEl.textContent = "";
+        const formData = new FormData(event.target);
+        const payload = {
+          amount: formData.get("amount"),
+          missionId: formData.get("missionId") || null,
+          reason: formData.get("reason") || null,
+          applyToAll: formData.get("applyToAll") === "on",
+          studentIds: Array.from(
+            document.querySelectorAll("#xpStudentList input[type='checkbox']:checked")
+          ).map((input) => Number(input.value)),
+        };
+        const res = await fetch("/api/admin/xp-awards", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          statusEl.textContent = data.error || "Vergabe fehlgeschlagen";
+          statusEl.classList.add("form-error");
+          return;
+        }
+        statusEl.classList.remove("form-error");
+        statusEl.textContent = `XP vergeben: ${data.xpAdded}`;
+        event.target.reset();
+        await loadStudents();
+      });
+
+      async function handleMultipartSubmit(formId, url, onSuccess) {
+        const form = document.getElementById(formId);
+        form.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const formData = new FormData(form);
+          const res = await fetch(url, {
+            method: "POST",
+            body: formData,
+          });
+          if (res.ok) {
+            form.reset();
+            await onSuccess();
+          }
+        });
+      }
+
+      handleMultipartSubmit("missionForm", "/api/admin/missions", async () => {
+        await loadMissions();
+      });
+      handleMultipartSubmit("bonusForm", "/api/admin/bonus-cards", async () => {
+        await loadBonusCards();
+      });
+      handleMultipartSubmit("characterForm", "/api/admin/characters", async () => {
+        await loadCharacters();
+      });
+
+      document.getElementById("levelForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const formData = Object.fromEntries(new FormData(event.target));
+        const res = await fetch("/api/admin/levels", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        });
+        if (res.ok) {
+          event.target.reset();
+          await loadLevels();
+        }
+      });
+
+      async function init() {
+        await fetchSession();
+        await loadActiveClass();
+        await Promise.all([
+          loadClasses(),
+          loadStudents(),
+          loadMissions(),
+          loadBonusCards(),
+          loadCharacters(),
+          loadLevels(),
+          loadUploads(),
+        ]);
+      }
+
+      init();
+    </script>
+  </body>
 </html>
