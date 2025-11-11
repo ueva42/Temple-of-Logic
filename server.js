@@ -1,61 +1,79 @@
 import express from "express";
 import session from "express-session";
-import sqlite3 from "sqlite3";
 import bcrypt from "bcrypt";
+import pg from "pg";
+import dotenv from "dotenv";
 import multer from "multer";
-import path from "path";
-import { fileURLToPath } from "url";
 import fs from "fs";
+import path from "path";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Datenbank initialisieren
-const db = new sqlite3.Database("temple.db");
-
-// Upload-Verzeichnis anlegen
-const uploadDir = path.join(__dirname, "public", "uploads");
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
-const upload = multer({ dest: uploadDir });
+// PostgreSQL Verbindung
+const { Pool } = pg;
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.DATABASE_URL.includes("railway")
+    ? { rejectUnauthorized: false }
+    : false,
+});
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(session({
-  secret: "temple-secret",
-  resave: false,
-  saveUninitialized: false
-}));
-app.use(express.static(path.join(__dirname, "public")));
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "temple-secret",
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+app.use(express.static("public"));
 
-// --- LOGIN ------------------------------------------------------
-app.post("/api/login", (req, res) => {
+// Uploads konfigurieren
+const uploadDir = process.env.UPLOAD_DIR || "uploads";
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, uploadDir),
+  filename: (req, file, cb) =>
+    cb(null, Date.now() + "-" + file.originalname.replace(/\s+/g, "_")),
+});
+const upload = multer({ storage });
+
+// ---------- LOGIN ----------
+app.post("/api/login", async (req, res) => {
   const { name, password } = req.body;
-  db.get("SELECT * FROM users WHERE name = ?", [name], async (err, user) => {
-    if (err) return res.status(500).json({ error: err.message });
-    if (!user) return res.status(400).json({ error: "Benutzer nicht gefunden" });
+
+  try {
+    const result = await pool.query("SELECT * FROM users WHERE name = $1", [
+      name,
+    ]);
+
+    if (result.rows.length === 0)
+      return res.status(400).json({ error: "Benutzer nicht gefunden" });
+
+    const user = result.rows[0];
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(400).json({ error: "Falsches Passwort" });
-    req.session.user = { id: user.id, role: user.role, class_id: user.class_id };
-    res.json({ role: user.role });
-  });
+
+    req.session.user = user;
+    res.json({ success: true, role: user.role });
+  } catch (err) {
+    console.error("Login Fehler:", err);
+    res.status(500).json({ error: "Serverfehler beim Login" });
+  }
 });
 
-// --- ADMINBEREICH ------------------------------------------------
-app.get("/api/classes", (req, res) => {
-  db.all("SELECT * FROM classes", (err, rows) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json(rows);
-  });
+// ---------- TEST ----------
+app.get("/", (req, res) => {
+  res.send("<h1>Temple of Logic läuft 🚀</h1>");
 });
 
-// --- Standardseiten ----------------------------------------------
-app.get("/", (_, res) => res.sendFile(path.join(__dirname, "public", "login.html")));
-app.get("/admin", (_, res) => res.sendFile(path.join(__dirname, "public", "admin.html")));
-app.get("/student", (_, res) => res.sendFile(path.join(__dirname, "public", "student.html")));
-
-// --- SERVER START ------------------------------------------------
-app.listen(PORT, () => console.log(`Temple of Logic läuft auf Port ${PORT}`));
+// ---------- SERVER ----------
+app.listen(PORT, () =>
+  console.log(`✅ Server läuft auf Port ${PORT}`)
+);
