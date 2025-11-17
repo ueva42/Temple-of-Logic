@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <title>Login – Temple of Logic</title>
+  <style>
+    body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #111; color: #eee; }
+    .box { background: #222; padding: 20px 30px; border-radius: 8px; min-width: 280px; }
+    input { width: 100%; padding: 8px; margin: 5px 0 10px; border-radius: 4px; border: 1px solid #444; background:#111; color:#eee; }
+    button { width: 100%; padding: 8px; border: none; border-radius: 4px; background: #4caf50; color: white; font-weight: bold; cursor: pointer; }
+    button:hover { background: #45a047; }
+    .error { color: #ff6b6b; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>Temple of Logic – Login</h2>
+    <input id="name" placeholder="Benutzername" />
+    <input id="password" type="password" placeholder="Passwort" />
+    <button onclick="login()">Login</button>
+    <div id="msg" class="error"></div>
+  </div>
+
+<script>
+async function login() {
+  const name = document.getElementById("name").value;
+  const password = document.getElementById("password").value;
+  const msg = document.getElementById("msg");
+  msg.textContent = "";
+
+  const res = await fetch("/api/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, password })
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    msg.textContent = text || "Login fehlgeschlagen";
+    return;
+  }
+
+  const data = await res.json();
+  localStorage.setItem("token", data.token);
+  localStorage.setItem("role", data.role);
+
+  if (data.role === "admin") {
+    window.location.href = "/admin.html";
+  } else {
+    alert("Studenten-UI ist noch nicht gebaut.");
+  }
+}
+</script>
+</body>
+</html>

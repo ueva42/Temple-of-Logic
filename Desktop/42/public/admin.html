@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <title>Adminbereich – Temple of Logic</title>
+  <style>
+    body { margin:0; font-family: sans-serif; display:flex; height:100vh; background:#111; color:#eee; }
+    #menu { width:220px; background:#000; padding:20px; box-sizing:border-box; }
+    #menu h2 { margin-top:0; }
+    #menu div.item { margin:8px 0; cursor:pointer; padding:6px 4px; border-radius:4px; }
+    #menu div.item:hover { background:#222; }
+    #content { flex:1; padding:20px; box-sizing:border-box; overflow-y:auto; }
+    input, button { padding:6px; margin:4px 0; border-radius:4px; border:1px solid #444; background:#111; color:#eee; }
+    button { cursor:pointer; border:none; background:#4caf50; }
+    button:hover { background:#45a047; }
+    ul { list-style:none; padding-left:0; }
+    li { margin:4px 0; }
+  </style>
+</head>
+<body>
+  <div id="menu">
+    <h2>Admin</h2>
+    <div class="item" onclick="showClasses()">Klassen</div>
+    <div class="item">Schüler:innen</div>
+    <div class="item">XP-Verwaltung</div>
+    <div class="item">Missionen</div>
+    <div class="item">Bonus-Karten</div>
+    <div class="item">Charakter & Level</div>
+    <hr />
+    <div class="item" onclick="logout()">Logout</div>
+  </div>
+
+  <div id="content">
+    <h1>Temple of Logic – Adminbereich</h1>
+    <p>Wähle links einen Bereich aus. Aktuell ist nur die Klassenverwaltung aktiv.</p>
+  </div>
+
+<script>
+const token = localStorage.getItem("token");
+const role = localStorage.getItem("role");
+
+if (!token || role !== "admin") {
+  window.location.href = "/login.html";
+}
+
+async function api(path, options = {}) {
+  options.headers = options.headers || {};
+  options.headers["Authorization"] = "Bearer " + token;
+  if (!options.headers["Content-Type"] && options.body) {
+    options.headers["Content-Type"] = "application/json";
+  }
+  const res = await fetch(path, options);
+  if (!res.ok) throw new Error(await res.text());
+  return res.json ? res.json() : null;
+}
+
+// ----------------------
+// Klassenverwaltung
+// ----------------------
+async function showClasses() {
+  let classes = [];
+  try {
+    const res = await fetch("/api/classes", {
+      headers: { "Authorization": "Bearer " + token }
+    });
+    if (!res.ok) {
+      const t = await res.text();
+      throw new Error(t);
+    }
+    classes = await res.json();
+  } catch (e) {
+    alert("Fehler beim Laden der Klassen: " + e.message);
+  }
+
+  let html = `
+    <h2>Klassenverwaltung</h2>
+    <input id="classname" placeholder="Neue Klasse"/>
+    <button onclick="addClass()">Anlegen</button>
+    <ul>
+  `;
+  classes.forEach(c => {
+    html += `<li>${c.name} 
+      <button onclick="deleteClass(${c.id})">löschen</button>
+    </li>`;
+  });
+  html += "</ul>";
+
+  document.getElementById("content").innerHTML = html;
+}
+
+async function addClass() {
+  const name = document.getElementById("classname").value;
+  if (!name) return;
+
+  await fetch("/api/classes", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
+    },
+    body: JSON.stringify({ name })
+  });
+
+  showClasses();
+}
+
+async function deleteClass(id) {
+  await fetch("/api/classes/" + id, {
+    method: "DELETE",
+    headers: {
+      "Authorization": "Bearer " + token
+    }
+  });
+
+  showClasses();
+}
+
+function logout() {
+  localStorage.removeItem("token");
+  localStorage.removeItem("role");
+  window.location.href = "/login.html";
+}
+</script>
+</body>
+</html>
