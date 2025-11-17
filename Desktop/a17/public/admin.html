@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Temple of Logic – Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #040410;
+      --sidebar: #090918;
+      --card: #101322;
+      --accent: #7a5cff;
+      --text: #f5f5ff;
+      --text-muted: #9ba0c2;
+    }
+    body {
+      margin: 0;
+      font-family: system-ui;
+      background: radial-gradient(circle at top, #20224b, #050613 60%);
+      color: var(--text);
+      display: flex;
+      height: 100vh;
+    }
+    .sidebar {
+      width: 260px;
+      background: #090918;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .nav button {
+      width: 100%;
+      padding: 0.6rem;
+      margin-bottom: 0.3rem;
+      border: none;
+      border-radius: 0.4rem;
+      background: rgba(255,255,255,0.05);
+      color: var(--text-muted);
+      text-align: left;
+      cursor: pointer;
+    }
+    .nav button.active {
+      background: rgba(122,92,255,0.25);
+      color: var(--text);
+    }
+    .main {
+      flex: 1;
+      padding: 1rem;
+      overflow-y: auto;
+    }
+    .card {
+      background: rgba(0,0,0,0.3);
+      padding: 1rem;
+      border-radius: 0.7rem;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .input-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .input-row input {
+      flex: 1;
+      padding: 0.5rem;
+      border-radius: 0.4rem;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.05);
+      color: white;
+    }
+    button.small {
+      padding: 0.4rem 0.7rem;
+      border-radius: 0.4rem;
+      background: rgba(122,92,255,0.3);
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+    .class-entry {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem;
+      border-radius: 0.4rem;
+      background: rgba(255,255,255,0.05);
+      margin-top: 0.4rem;
+    }
+    .active-tag {
+      color: #7af0d0;
+      font-size: 0.8rem;
+      margin-left: 0.4rem;
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <h2>Temple of Logic</h2>
+    <div class="nav">
+      <button class="active" data-section="classes">Klassen</button>
+      <button data-section="students">Schüler:innen</button>
+      <button data-section="xp">XP</button>
+      <button data-section="missions">Missionen</button>
+      <button data-section="bonus">Bonuskarten</button>
+      <button data-section="characters">Charaktere</button>
+      <button data-section="levels">Level</button>
+    </div>
+    <button id="logoutBtn" class="small">Logout</button>
+  </aside>
+
+  <main class="main">
+    <h1 id="sectionTitle">Klassen</h1>
+
+    <div class="card" id="content">
+      <!-- Dynamisch -->
+    </div>
+  </main>
+
+  <script>
+    // Navigation
+    const buttons = document.querySelectorAll(".nav button");
+    const content = document.getElementById("content");
+    const titleEl = document.getElementById("sectionTitle");
+
+    buttons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        buttons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        loadSection(btn.dataset.section);
+      });
+    });
+
+    function loadSection(section) {
+      titleEl.textContent = btnText(section);
+
+      if (section === "classes") {
+        loadClassesUI();
+        return;
+      }
+
+      content.innerHTML = `<p>Modul "${section}" folgt.</p>`;
+    }
+
+    function btnText(key) {
+      return {
+        classes: "Klassen",
+        students: "Schüler:innen",
+        xp: "XP-Vergabe",
+        missions: "Missionen",
+        bonus: "Bonuskarten",
+        characters: "Charaktere",
+        levels: "Level"
+      }[key];
+    }
+
+    // ----------------------------
+    // KLASSEN – UI + API
+    // ----------------------------
+    async function loadClassesUI() {
+      content.innerHTML = `
+        <div class="input-row">
+          <input id="newClassName" placeholder="Neue Klasse…" />
+          <button class="small" id="addClassBtn">Hinzufügen</button>
+        </div>
+        <div id="classList">Lade Klassen…</div>
+      `;
+
+      document.getElementById("addClassBtn").onclick = addClass;
+      loadClasses();
+    }
+
+    async function loadClasses() {
+      const r = await fetch("/api/classes");
+      const data = await r.json();
+
+      const wrap = document.getElementById("classList");
+      wrap.innerHTML = "";
+
+      data.classes.forEach(c => {
+        const div = document.createElement("div");
+        div.className = "class-entry";
+
+        div.innerHTML = `
+          <div>
+            ${c.name}
+            ${String(data.active_class) === String(c.id) ? "<span class='active-tag'>(aktiv)</span>" : ""}
+          </div>
+          <div>
+            <button class="small" onclick="setActive(${c.id})">Aktiv</button>
+            <button class="small" onclick="delClass(${c.id})">Löschen</button>
+          </div>
+        `;
+
+        wrap.appendChild(div);
+      });
+    }
+
+    async function addClass() {
+      const name = document.getElementById("newClassName").value.trim();
+      if (!name) return;
+
+      await fetch("/api/classes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name })
+      });
+      document.getElementById("newClassName").value = "";
+      loadClasses();
+    }
+
+    async function delClass(id) {
+      await fetch(`/api/classes/${id}`, { method: "DELETE" });
+      loadClasses();
+    }
+
+    async function setActive(id) {
+      await fetch(`/api/classes/active`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id })
+      });
+      loadClasses();
+    }
+
+    // Logout
+    document.getElementById("logoutBtn").onclick = async () => {
+      await fetch("/api/logout", { method: "POST" });
+      window.location.href = "/login.html";
+    };
+
+    // Initial
+    loadSection("classes");
+  </script>
+</body>
+</html>
