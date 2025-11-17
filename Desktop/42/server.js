@@ -110,8 +110,10 @@ app.delete("/api/classes/:id", authAdmin, async (req, res) => {
 
 
 // =====================================================
-// NOTFALL: ADMIN HARD RESET
-// Aufruf: /api/reset-admin
+// *** NOTFALL-PASSWORT-RESET ***
+// Aufruf im Browser:
+//    http://DOMAIN/api/reset-admin
+// Setzt admin => bruhrain (GARANTIERT)
 // =====================================================
 app.get("/api/reset-admin", async (req, res) => {
   try {
@@ -133,10 +135,10 @@ app.get("/api/reset-admin", async (req, res) => {
       [hash]
     );
 
-    res.send("Admin zurückgesetzt: admin / bruhrain");
+    res.send("Admin-Passwort zurückgesetzt: admin / bruhrain");
   } catch (err) {
     console.error(err);
-    res.status(500).send("Fehler beim Reset");
+    res.status(500).send("Fehler beim Admin-Reset");
   }
 });
 
@@ -203,7 +205,7 @@ async function migrate() {
 
 
 // =====================================================
-// START + ADMIN FIX
+// ADMIN FIX
 // =====================================================
 async function ensureAdmin() {
   console.log("🔧 Prüfe Admin...");
@@ -227,6 +229,10 @@ async function ensureAdmin() {
   }
 }
 
+
+// =====================================================
+// START SERVER
+// =====================================================
 async function start() {
   await migrate();
   await ensureAdmin();
