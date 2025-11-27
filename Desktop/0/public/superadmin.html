@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Streets of Logic – Superadmin</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      color: #f9fafb;
+      font-family: "Roboto", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(255,184,108,0.18) 0, transparent 50%),
+        radial-gradient(circle at 90% 20%, rgba(255,46,99,0.26) 0, transparent 55%),
+        radial-gradient(circle at 50% 100%, rgba(56,189,248,0.25) 0, transparent 60%),
+        #050816;
+    }
+
+    h1, h2, h3 {
+      margin-top: 0;
+    }
+
+    h1 {
+      font-family: "Bangers", cursive;
+      letter-spacing: 0.18em;
+      font-size: 30px;
+      text-transform: uppercase;
+      color: #fffbeb;
+      text-shadow: 0 0 6px rgba(0,0,0,0.9),
+                   0 0 18px rgba(255,212,128,0.9);
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-size: 20px;
+      margin-bottom: 8px;
+      letter-spacing: 0.04em;
+      color: #e5e7eb;
+    }
+
+    h3 {
+      font-size: 16px;
+      margin-bottom: 6px;
+      color: #e5e7eb;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 260px;
+      background:
+        radial-gradient(circle at top left, #111827 0, #020617 55%, #02010a 100%);
+      padding: 20px 16px;
+      border-right: 2px solid rgba(248,250,252,0.06);
+      box-shadow: 0 0 25px rgba(0,0,0,0.9);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .sidebar-logo-orb {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 30% 20%, #ffe066 0, #ff9800 25%, #f97316 40%, #7c2d12 70%, #020617 100%);
+      box-shadow:
+        0 0 12px rgba(255,224,102,1),
+        0 0 24px rgba(249,115,22,0.9);
+      border: 2px solid #111827;
+    }
+
+    .sidebar-title {
+      font-family: "Bangers", cursive;
+      font-size: 16px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #fef9c3;
+      text-shadow: 0 0 5px rgba(0,0,0,0.9);
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .sidebar-subtitle {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #9ca3af;
+      margin-top: 2px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      padding: 9px 11px;
+      margin-top: 6px;
+      border-radius: 999px;
+      cursor: pointer;
+      background: rgba(15,23,42,0.92);
+      border: 1px solid rgba(148,163,184,0.28);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.85);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border 0.15s ease, background 0.15s ease;
+    }
+
+    .nav-item svg {
+      width: 20px;
+      height: 20px;
+      margin-right: 8px;
+      fill: #f97316;
+      flex-shrink: 0;
+    }
+
+    .nav-label {
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .nav-item:hover {
+      transform: translateX(4px);
+      background: linear-gradient(120deg, rgba(248,250,252,0.08), rgba(15,23,42,0.97));
+      border-color: #f97316;
+      box-shadow:
+        0 5px 12px rgba(0,0,0,0.95),
+        0 0 12px rgba(249,115,22,0.7);
+    }
+
+    .nav-item.active {
+      background: linear-gradient(120deg, #f97316, #ec4899);
+      border-color: #facc15;
+      box-shadow:
+        0 5px 14px rgba(0,0,0,0.95),
+        0 0 16px rgba(249,115,22,0.9);
+    }
+
+    .nav-item.active .nav-label {
+      color: #0b1120;
+      font-weight: 600;
+    }
+
+    .nav-item.active svg {
+      fill: #0b1120;
+    }
+
+    .nav-item-logout {
+      margin-top: auto;
+      background: linear-gradient(120deg, #dc2626, #b91c1c);
+      border-color: #fecaca;
+    }
+
+    .nav-item-logout svg {
+      fill: #fee2e2;
+    }
+
+    .nav-item-logout .nav-label {
+      color: #fef2f2;
+      font-weight: 600;
+    }
+
+    .nav-item-logout:hover {
+      background: linear-gradient(120deg, #f97373, #b91c1c);
+      box-shadow:
+        0 6px 14px rgba(0,0,0,0.96),
+        0 0 16px rgba(248,113,113,0.9);
+    }
+
+    /* CONTENT */
+    .content {
+      flex-grow: 1;
+      height: 100vh;
+      padding: 20px 22px;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .content-inner {
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 16px;
+    }
+
+    .page-subtitle {
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #9ca3af;
+      opacity: 0.9;
+    }
+
+    .tab {
+      margin-bottom: 32px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .panel {
+      background: rgba(15,23,42,0.94);
+      border-radius: 18px;
+      border: 2px solid rgba(15,23,42,1);
+      outline: 2px solid rgba(15,23,42,0.6);
+      box-shadow:
+        0 6px 20px rgba(0,0,0,0.95),
+        0 0 18px rgba(15,23,42,0.7);
+      padding: 16px 18px 18px 18px;
+      margin-bottom: 18px;
+      position: relative;
+    }
+
+    .panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 18px;
+      border: 1px solid rgba(248,250,252,0.03);
+      pointer-events: none;
+    }
+
+    .panel h3 {
+      margin-top: 0;
+      margin-bottom: 6px;
+      font-size: 15px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #e5e7eb;
+    }
+
+    .panel small {
+      font-size: 11px;
+      color: #9ca3af;
+    }
+
+    input, select {
+      padding: 6px 9px;
+      margin: 4px 4px 6px 0;
+      background: #020617;
+      color: #e5e7eb;
+      border-radius: 999px;
+      border: 1px solid #4b5563;
+      min-width: 180px;
+      font-size: 13px;
+      outline: none;
+      transition: border 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+
+    select.wide {
+      min-width: 240px;
+    }
+
+    input:focus, select:focus {
+      border-color: #f97316;
+      background: #020617;
+      box-shadow: 0 0 0 1px rgba(249,115,22,0.7);
+    }
+
+    button.action {
+      border: none;
+      border-radius: 999px;
+      padding: 7px 14px;
+      margin: 4px 4px 6px 0;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 600;
+      cursor: pointer;
+      background: linear-gradient(120deg, #22c55e, #16a34a);
+      color: #020617;
+      box-shadow:
+        0 4px 12px rgba(0,0,0,0.9),
+        0 0 12px rgba(34,197,94,0.6);
+      transform: skewX(-7deg);
+      transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+    }
+
+    button.action:hover {
+      filter: brightness(1.05);
+      transform: skewX(-7deg) translateY(-1px);
+      box-shadow:
+        0 6px 16px rgba(0,0,0,0.95),
+        0 0 16px rgba(52,211,153,0.8);
+    }
+
+    button.delete {
+      border: none;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      background: linear-gradient(120deg, #ef4444, #b91c1c);
+      color: #fef2f2;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.9);
+      transform: skewX(-7deg);
+      transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+    }
+
+    button.delete:hover {
+      filter: brightness(1.05);
+      transform: skewX(-7deg) translateY(-1px);
+      box-shadow:
+        0 4px 10px rgba(0,0,0,0.95),
+        0 0 10px rgba(248,113,113,0.8);
+    }
+
+    .hint {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-top: 4px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 8px;
+      margin-top: 8px;
+      font-size: 13px;
+    }
+
+    thead tr th {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #9ca3af;
+    }
+
+    table tbody tr {
+      background: radial-gradient(circle at top left, #020617 0, #0b1120 60%, #020617 100%);
+      border-radius: 12px;
+      border: 1px solid rgba(75,85,99,0.65);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.9);
+    }
+
+    table td, table th {
+      padding: 8px 12px;
+      vertical-align: middle;
+      text-align: left;
+    }
+
+    table tbody tr td:first-child {
+      border-radius: 12px 0 0 12px;
+    }
+
+    table tbody tr td:last-child {
+      border-radius: 0 12px 12px 0;
+    }
+
+    @media (max-width: 900px) {
+      body {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        overflow-x: auto;
+      }
+      .nav-item {
+        flex: 0 0 auto;
+        margin-top: 4px;
+        margin-right: 6px;
+      }
+      .nav-item-logout {
+        margin-left: auto;
+      }
+      .content {
+        padding: 14px;
+        height: calc(100vh - 90px);
+      }
+      .content-inner {
+        max-width: 100%;
+      }
+      h1 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo-orb"></div>
+    <div>
+      <h2 class="sidebar-title">STREETS OF LOGIC</h2>
+      <div class="sidebar-subtitle">SUPERADMIN</div>
+    </div>
+  </div>
+
+  <div class="nav-item active" onclick="showTab('schoolsTab', event)">
+    <svg viewBox="0 0 24 24"><path d="M4 10l8-6 8 6-8 6-8-6zm0 4l8 6 8-6"/></svg>
+    <span class="nav-label">Schulen</span>
+  </div>
+
+  <div class="nav-item" onclick="showTab('adminsTab', event)">
+    <svg viewBox="0 0 24 24"><path d="M12 12c2.2 0 4-1.8 4-4s-1.8-4-4-4-4 1.8-4 4 1.8 4 4 4zm0 2c-3 0-9 1.5-9 4.5V21h18v-2.5C21 15.5 15 14 12 14z"/></svg>
+    <span class="nav-label">Admins</span>
+  </div>
+
+  <div class="nav-item" onclick="showTab('statusTab', event)">
+    <svg viewBox="0 0 24 24"><path d="M4 19h4V5H4v14zm6 0h4V9h-4v10zm6 0h4V3h-4v16z"/></svg>
+    <span class="nav-label">Systemstatus</span>
+  </div>
+
+  <div class="nav-item" onclick="showTab('resetTab', event)">
+    <svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H2l3.5 4L9 12H6a7 7 0 1 1 2.05 4.95l-1.42 1.42A9 9 0 1 0 13 3z"/></svg>
+    <span class="nav-label">Installation / Reset</span>
+  </div>
+
+  <div class="nav-item nav-item-logout" onclick="logout()">
+    <svg viewBox="0 0 24 24"><path d="M16 13v-2H7V8l-5 4 5 4v-3h9zm3-10H9v2h10v14H9v2h10c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
+    <span class="nav-label">Logout</span>
+  </div>
+</div>
+
+<div class="content">
+  <div class="content-inner">
+    <div class="page-header">
+      <div>
+        <h1>STREETS OF LOGIC</h1>
+        <div class="page-subtitle">MULTI-SCHOOL – SUPERADMIN PANEL</div>
+      </div>
+    </div>
+
+    <!-- SCHULEN -->
+    <div id="schoolsTab" class="tab">
+      <div class="panel">
+        <h2>Schule anlegen</h2>
+        <input id="schoolNameInput" placeholder="Schulname (z.B. ADSZ)" />
+        <input id="schoolSlugInput" placeholder="Slug (z.B. adsz)" />
+        <button class="action" onclick="createSchool()">Schule speichern</button>
+        <p class="hint">
+          Der <b>Slug</b> wird für die Zuordnung verwendet und sollte kurz, klein geschrieben und eindeutig sein.<br>
+          Beispiel: Name: <b>ADSZ</b> → Slug: <b>adsz</b>.
+        </p>
+      </div>
+
+      <div class="panel">
+        <h3>Bestehende Schulen</h3>
+        <table id="schoolTable">
+          <thead>
+          <tr>
+            <th>Name</th>
+            <th>Slug</th>
+            <th>Aktion</th>
+          </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ADMINS -->
+    <div id="adminsTab" class="tab hidden">
+      <div class="panel">
+        <h2>Admins verwalten</h2>
+        <div>
+          <input id="adminNameInput" placeholder="Benutzername" />
+          <select id="adminSchoolSelect" class="wide"></select>
+          <button class="action" onclick="createAdmin()">Admin erstellen</button>
+        </div>
+        <p class="hint">
+          Es wird ein <b>Einmalpasswort</b> erzeugt und angezeigt. Der Admin sollte es beim ersten Login ändern.
+        </p>
+      </div>
+
+      <div class="panel">
+        <h3>Bestehende Admins</h3>
+        <table id="adminTable">
+          <thead>
+          <tr>
+            <th>Schule</th>
+            <th>Benutzername</th>
+            <th>Passwort (aktueller Stand)</th>
+            <th>Aktionen</th>
+          </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- STATUS -->
+    <div id="statusTab" class="tab hidden">
+      <div class="panel">
+        <h2>Systemstatus</h2>
+        <p class="hint">
+          Überblick über Datenmenge pro Schule. Gut um zu sehen, ob eine Instanz wirklich „leer“ ist.
+        </p>
+        <table id="statusTable">
+          <thead>
+          <tr>
+            <th>Schule</th>
+            <th>Superadmins</th>
+            <th>Admins</th>
+            <th>Schüler</th>
+            <th>Klassen</th>
+            <th>Missionen</th>
+            <th>Bonuskarten</th>
+            <th>Charaktere</th>
+            <th>Level</th>
+            <th>Uploads</th>
+            <th>XP-Einträge</th>
+          </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- RESET -->
+    <div id="resetTab" class="tab hidden">
+      <div class="panel">
+        <h2>Installation / Reset</h2>
+        <p class="hint">
+          Hier kannst du die Daten einer Schule zurücksetzen (Klassen, Schüler:innen, Missionen, Bonuskarten, 
+          Charaktere, Level, Uploads und XP-Einträge). Admin-Accounts und Superadmin bleiben bestehen.
+        </p>
+        <div>
+          <select id="resetSchoolSelect" class="wide"></select>
+          <button class="action" onclick="resetSchool()">Daten der Schule leeren</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let schoolsCache = [];
+
+/* Tabs */
+function showTab(id, ev) {
+  document.querySelectorAll(".tab").forEach(t => t.classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
+
+  document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+  if (ev && ev.currentTarget && !ev.currentTarget.classList.contains("nav-item-logout")) {
+    ev.currentTarget.classList.add("active");
+  }
+
+  if (id === "schoolsTab") loadSchools();
+  if (id === "adminsTab") { loadSchools().then(populateAdminSchoolSelect); loadAdmins(); }
+  if (id === "statusTab") loadSystemStatus();
+  if (id === "resetTab") { loadSchools().then(populateResetSchoolSelect); }
+}
+
+/* Logout */
+async function logout() {
+  await fetch("/api/logout", { method: "POST" });
+  location.href = "/login.html";
+}
+
+/* Helper: Slug automatisch aus Namen */
+document.getElementById("schoolNameInput").addEventListener("input", (e) => {
+  const val = e.target.value.trim().toLowerCase();
+  const slug = val
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  const slugInput = document.getElementById("schoolSlugInput");
+  if (!slugInput.value) slugInput.value = slug;
+});
+
+/* Schulen laden */
+async function loadSchools() {
+  const r = await fetch("/api/superadmin/schools");
+  schoolsCache = await r.json();
+
+  const tbody = document.querySelector("#schoolTable tbody");
+  if (tbody) {
+    tbody.innerHTML = "";
+    schoolsCache.forEach(s => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${s.name}</td>
+        <td>${s.slug}</td>
+        <td><button class="delete" onclick="deleteSchool(${s.id})">Löschen</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  return schoolsCache;
+}
+
+async function createSchool() {
+  const name = document.getElementById("schoolNameInput").value.trim();
+  const slug = document.getElementById("schoolSlugInput").value.trim().toLowerCase();
+  if (!name || !slug) return;
+
+  await fetch("/api/superadmin/schools", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ name, slug })
+  });
+
+  document.getElementById("schoolNameInput").value = "";
+  document.getElementById("schoolSlugInput").value = "";
+  await loadSchools();
+  await loadSystemStatus();
+}
+
+async function deleteSchool(id) {
+  if (!confirm("Schule wirklich löschen? (Daten bleiben vorerst bestehen, nur Schuleintrag wird entfernt.)")) return;
+  await fetch(`/api/superadmin/schools/${id}`, { method:"DELETE" });
+  await loadSchools();
+  await loadSystemStatus();
+}
+
+/* Admin-School-Select füllen */
+function populateAdminSchoolSelect() {
+  const sel = document.getElementById("adminSchoolSelect");
+  sel.innerHTML = "";
+  schoolsCache.forEach(s => {
+    const opt = document.createElement("option");
+    opt.value = s.slug;
+    opt.textContent = `${s.name} (${s.slug})`;
+    sel.appendChild(opt);
+  });
+}
+
+/* Reset-School-Select */
+function populateResetSchoolSelect() {
+  const sel = document.getElementById("resetSchoolSelect");
+  sel.innerHTML = "";
+  schoolsCache.forEach(s => {
+    const opt = document.createElement("option");
+    opt.value = s.id;
+    opt.textContent = `${s.name} (${s.slug})`;
+    sel.appendChild(opt);
+  });
+}
+
+/* Admins laden */
+async function loadAdmins() {
+  const r = await fetch("/api/superadmin/admins");
+  const admins = await r.json();
+
+  const tbody = document.querySelector("#adminTable tbody");
+  tbody.innerHTML = "";
+
+  admins.forEach(a => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${a.school_name} (${a.slug})</td>
+      <td>${a.name}</td>
+      <td id="admin_pw_${a.id}">${a.password}</td>
+      <td>
+        <button class="action" onclick="resetAdminPassword(${a.id})">Reset PW</button>
+        <button class="delete" onclick="deleteAdmin(${a.id})">X</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+/* Admin anlegen */
+async function createAdmin() {
+  const name = document.getElementById("adminNameInput").value.trim();
+  const slug = document.getElementById("adminSchoolSelect").value;
+  if (!name || !slug) return;
+
+  const r = await fetch("/api/superadmin/admins", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ name, slug })
+  });
+  const data = await r.json();
+
+  if (!data.success) {
+    alert(data.message || "Admin konnte nicht angelegt werden.");
+    return;
+  }
+
+  document.getElementById("adminNameInput").value = "";
+  await loadAdmins();
+
+  if (data.password) {
+    alert(`Einmalpasswort für Admin "${name}": ${data.password}`);
+  }
+}
+
+/* Admin PW reset */
+async function resetAdminPassword(id) {
+  const r = await fetch(`/api/superadmin/admins/reset/${id}`, { method:"POST" });
+  const data = await r.json();
+  if (!data.success) {
+    alert(data.message || "Reset fehlgeschlagen.");
+    return;
+  }
+  const cell = document.getElementById(`admin_pw_${id}`);
+  if (cell) cell.textContent = data.password;
+  alert(`Neues Passwort: ${data.password}`);
+}
+
+/* Admin löschen */
+async function deleteAdmin(id) {
+  if (!confirm("Admin wirklich löschen?")) return;
+  await fetch(`/api/superadmin/admins/${id}`, { method:"DELETE" });
+  await loadAdmins();
+}
+
+/* Systemstatus laden */
+async function loadSystemStatus() {
+  const r = await fetch("/api/superadmin/system-status");
+  const rows = await r.json();
+
+  const tbody = document.querySelector("#statusTable tbody");
+  tbody.innerHTML = "";
+
+  rows.forEach(s => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${s.name} (${s.slug})</td>
+      <td>${s.superadmins}</td>
+      <td>${s.admins}</td>
+      <td>${s.students}</td>
+      <td>${s.classes}</td>
+      <td>${s.missions}</td>
+      <td>${s.bonuscards}</td>
+      <td>${s.characters}</td>
+      <td>${s.levels}</td>
+      <td>${s.uploads}</td>
+      <td>${s.xp_entries}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+/* Schul-Reset */
+async function resetSchool() {
+  const schoolId = document.getElementById("resetSchoolSelect").value;
+  if (!schoolId) return;
+
+  const school = schoolsCache.find(s => s.id === Number(schoolId));
+  const name = school ? school.name : schoolId;
+
+  if (!confirm(`Alle Daten der Schule "${name}" (Klassen, Schüler, Missionen, Boni, Charaktere, Level, Uploads, XP) löschen? Admins bleiben erhalten.`)) {
+    return;
+  }
+
+  const r = await fetch("/api/superadmin/reset-school", {
+    method: "POST",
+    headers: { "Content-Type":"application/json" },
+    body: JSON.stringify({ schoolId })
+  });
+  const data = await r.json();
+  if (!data.success) {
+    alert(data.message || "Reset fehlgeschlagen.");
+    return;
+  }
+
+  alert("Daten dieser Schule wurden geleert.");
+  await loadSystemStatus();
+}
+
+/* Initial */
+showTab("schoolsTab");
+loadSchools();
+</script>
+
+</body>
+</html>

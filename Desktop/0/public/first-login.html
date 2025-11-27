@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Streets of Logic – Erst-Login</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      height: 100vh;
+      font-family: "Roboto", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(255,184,108,0.18) 0, transparent 50%),
+        radial-gradient(circle at 90% 20%, rgba(255,46,99,0.26) 0, transparent 55%),
+        radial-gradient(circle at 50% 100%, rgba(56,189,248,0.25) 0, transparent 60%),
+        #050816;
+      color: #f9fafb;
+    }
+
+    .frame {
+      width: 380px;
+      max-width: 95vw;
+      background: rgba(15,23,42,0.96);
+      border-radius: 20px;
+      border: 2px solid rgba(15,23,42,1);
+      outline: 2px solid rgba(15,23,42,0.6);
+      box-shadow:
+        0 12px 35px rgba(0,0,0,0.95),
+        0 0 22px rgba(15,23,42,0.9);
+      padding: 20px 22px 22px;
+      position: relative;
+    }
+
+    .frame::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      border: 1px solid rgba(248,250,252,0.04);
+      pointer-events: none;
+    }
+
+    .title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .logo-orb {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 30% 20%, #e5e7eb 0, #9ca3af 25%, #4b5563 40%, #020617 80%);
+      box-shadow:
+        0 0 12px rgba(148,163,184,0.9),
+        0 0 24px rgba(148,163,184,0.7);
+      border: 2px solid #111827;
+      flex-shrink: 0;
+    }
+
+    h1 {
+      font-family: "Bangers", cursive;
+      letter-spacing: 0.18em;
+      font-size: 22px;
+      text-transform: uppercase;
+      color: #fffbeb;
+      text-shadow: 0 0 6px rgba(0,0,0,0.9),
+                   0 0 14px rgba(209,213,219,0.9);
+      margin: 0;
+      line-height: 1.1;
+    }
+
+    .subtitle {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: #9ca3af;
+      margin-top: 2px;
+    }
+
+    .badge {
+      margin-top: 6px;
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      background: linear-gradient(120deg, #f97316, #e11d48);
+      color: #020617;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.9);
+      transform: skewX(-8deg);
+    }
+
+    .hint {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-top: 10px;
+      line-height: 1.4;
+    }
+
+    .hint b {
+      color: #e5e7eb;
+    }
+
+    label {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #d1d5db;
+      margin-top: 12px;
+      margin-bottom: 4px;
+    }
+
+    input {
+      width: 100%;
+      padding: 7px 11px;
+      border-radius: 999px;
+      border: 1px solid #4b5563;
+      background: #020617;
+      color: #e5e7eb;
+      font-size: 13px;
+      outline: none;
+      transition: border 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+
+    input:focus {
+      border-color: #f97316;
+      background: #020617;
+      box-shadow: 0 0 0 1px rgba(249,115,22,0.7);
+    }
+
+    .btn-save {
+      width: 100%;
+      margin-top: 16px;
+      border: none;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 600;
+      cursor: pointer;
+      background: linear-gradient(120deg, #22c55e, #16a34a);
+      color: #020617;
+      box-shadow:
+        0 5px 14px rgba(0,0,0,0.95),
+        0 0 16px rgba(34,197,94,0.7);
+      transform: skewX(-8deg);
+      transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+    }
+
+    .btn-save:hover {
+      filter: brightness(1.05);
+      transform: skewX(-8deg) translateY(-1px);
+      box-shadow:
+        0 7px 18px rgba(0,0,0,0.96),
+        0 0 18px rgba(52,211,153,0.85);
+    }
+
+    .error {
+      margin-top: 10px;
+      font-size: 11px;
+      color: #fecaca;
+      background: rgba(127,29,29,0.3);
+      border: 1px solid rgba(248,113,113,0.7);
+      border-radius: 10px;
+      padding: 6px 9px;
+    }
+
+    .success {
+      margin-top: 10px;
+      font-size: 11px;
+      color: #bbf7d0;
+      background: rgba(22,163,74,0.25);
+      border: 1px solid rgba(52,211,153,0.8);
+      border-radius: 10px;
+      padding: 6px 9px;
+    }
+
+    .foot {
+      margin-top: 14px;
+      font-size: 10px;
+      color: #9ca3af;
+      text-align: center;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+
+<div class="frame">
+  <div class="title-wrap">
+    <div class="logo-orb"></div>
+    <div>
+      <h1>FIRST LOGIN</h1>
+      <div class="subtitle">PASSWORD RESET TERMINAL</div>
+    </div>
+  </div>
+
+  <div class="badge">EINMALPASSWORT AKTIV</div>
+
+  <p class="hint">
+    Du bist mit einem <b>Einmalpasswort</b> eingeloggt.
+    <br>Bitte wähle jetzt ein <b>neues persönliches Passwort</b>.
+  </p>
+
+  <label for="currentPassword">Aktuelles Einmalpasswort</label>
+  <input id="currentPassword" type="password" autocomplete="off" />
+
+  <label for="newPassword">Neues Passwort</label>
+  <input id="newPassword" type="password" autocomplete="new-password" />
+
+  <label for="newPassword2">Neues Passwort wiederholen</label>
+  <input id="newPassword2" type="password" autocomplete="new-password" />
+
+  <button class="btn-save" id="saveButton" onclick="saveNewPassword()">
+    Passwort setzen
+  </button>
+
+  <div id="errorBox" class="error" style="display:none;"></div>
+  <div id="successBox" class="success" style="display:none;"></div>
+
+  <div class="foot">
+    Nach erfolgreicher Änderung wirst du zum Login zurückgeführt.
+  </div>
+</div>
+
+<script>
+  async function saveNewPassword() {
+    const btn = document.getElementById("saveButton");
+    const errorBox = document.getElementById("errorBox");
+    const successBox = document.getElementById("successBox");
+
+    const currentPassword = document.getElementById("currentPassword").value.trim();
+    const newPassword = document.getElementById("newPassword").value.trim();
+    const newPassword2 = document.getElementById("newPassword2").value.trim();
+
+    errorBox.style.display = "none";
+    errorBox.textContent = "";
+    successBox.style.display = "none";
+    successBox.textContent = "";
+
+    if (!currentPassword || !newPassword || !newPassword2) {
+      errorBox.textContent = "Bitte alle Felder ausfüllen.";
+      errorBox.style.display = "block";
+      return;
+    }
+
+    if (newPassword !== newPassword2) {
+      errorBox.textContent = "Die neuen Passwörter stimmen nicht überein.";
+      errorBox.style.display = "block";
+      return;
+    }
+
+    if (newPassword.length < 4) {
+      errorBox.textContent = "Neues Passwort sollte mindestens 4 Zeichen lang sein.";
+      errorBox.style.display = "block";
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "Speichern...";
+
+    try {
+      const res = await fetch("/api/first-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentPassword, newPassword })
+      });
+
+      const data = await res.json();
+
+      if (!data.success) {
+        errorBox.textContent = data.message || "Fehler beim Setzen des Passworts.";
+        errorBox.style.display = "block";
+        btn.disabled = false;
+        btn.textContent = "Passwort setzen";
+        return;
+      }
+
+      successBox.textContent = "Passwort erfolgreich geändert. Du wirst gleich zum Login weitergeleitet.";
+      successBox.style.display = "block";
+
+      setTimeout(() => {
+        window.location.href = "/login.html";
+      }, 1500);
+
+    } catch (err) {
+      console.error(err);
+      errorBox.textContent = "Serverfehler oder keine Verbindung. Bitte später erneut versuchen.";
+      errorBox.style.display = "block";
+      btn.disabled = false;
+      btn.textContent = "Passwort setzen";
+    }
+  }
+
+  // Enter-Taste -> speichern
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      saveNewPassword();
+    }
+  });
+</script>
+
+</body>
+</html>

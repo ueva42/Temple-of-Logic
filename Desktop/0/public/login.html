@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Streets of Logic – Login</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      height: 100vh;
+      font-family: "Roboto", sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(255,184,108,0.18) 0, transparent 50%),
+        radial-gradient(circle at 90% 20%, rgba(255,46,99,0.26) 0, transparent 55%),
+        radial-gradient(circle at 50% 100%, rgba(56,189,248,0.25) 0, transparent 60%),
+        #050816;
+      color: #f9fafb;
+    }
+
+    .frame {
+      width: 370px;
+      max-width: 95vw;
+      background: rgba(15,23,42,0.96);
+      border-radius: 20px;
+      border: 2px solid rgba(15,23,42,1);
+      outline: 2px solid rgba(15,23,42,0.6);
+      box-shadow: 0 12px 35px rgba(0,0,0,0.95),
+                  0 0 22px rgba(15,23,42,0.9);
+      padding: 20px 22px 22px;
+      position: relative;
+    }
+
+    .frame::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      border: 1px solid rgba(248,250,252,0.04);
+      pointer-events: none;
+    }
+
+    .title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .logo-orb {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 30% 20%, #ffe066 0, #ff9800 25%, #f97316 40%, #7c2d12 70%, #020617 100%);
+      box-shadow:
+        0 0 12px rgba(255,224,102,1),
+        0 0 24px rgba(249,115,22,0.9);
+      border: 2px solid #111827;
+      flex-shrink: 0;
+    }
+
+    h1 {
+      font-family: "Bangers", cursive;
+      letter-spacing: 0.2em;
+      font-size: 24px;
+      text-transform: uppercase;
+      color: #fffbeb;
+      text-shadow:
+        0 0 6px rgba(0,0,0,0.9),
+        0 0 18px rgba(255,212,128,0.9);
+      margin: 0;
+      line-height: 1.1;
+    }
+
+    .subtitle {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: #9ca3af;
+      margin-top: 2px;
+    }
+
+    /* Labels */
+    label {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #d1d5db;
+      margin-top: 12px;
+      margin-bottom: 4px;
+    }
+
+    input {
+      width: 100%;
+      padding: 7px 11px;
+      border-radius: 999px;
+      border: 1px solid #4b5563;
+      background: #020617;
+      color: #e5e7eb;
+      font-size: 13px;
+      outline: none;
+      transition: 0.2s ease;
+    }
+
+    input:focus {
+      border-color: #f97316;
+      box-shadow: 0 0 0 1px rgba(249,115,22,0.7);
+    }
+
+    .btn-login {
+      width: 100%;
+      margin-top: 16px;
+      border: none;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 600;
+      cursor: pointer;
+      background: linear-gradient(120deg, #22c55e, #16a34a);
+      color: #020617;
+      box-shadow:
+        0 5px 14px rgba(0,0,0,0.95),
+        0 0 16px rgba(34,197,94,0.7);
+      transform: skewX(-8deg);
+      transition: 0.12s ease;
+    }
+
+    .btn-login:hover {
+      filter: brightness(1.05);
+      transform: skewX(-8deg) translateY(-1px);
+    }
+
+    .error {
+      margin-top: 10px;
+      font-size: 11px;
+      color: #fecaca;
+      background: rgba(127,29,29,0.3);
+      border: 1px solid rgba(248,113,113,0.7);
+      border-radius: 10px;
+      padding: 6px 9px;
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+<div class="frame">
+
+  <div class="title-wrap">
+    <div class="logo-orb"></div>
+    <div>
+      <h1>STREETS OF LOGIC</h1>
+      <div class="subtitle">LOGIN TERMINAL</div>
+    </div>
+  </div>
+
+  <label for="username">Benutzername</label>
+  <input id="username" autocomplete="username" />
+
+  <label for="password">Passwort</label>
+  <input id="password" type="password" autocomplete="current-password" />
+
+  <button class="btn-login" id="loginButton" onclick="doLogin()">Login</button>
+
+  <div id="errorBox" class="error"></div>
+
+</div>
+
+<script>
+  async function doLogin() {
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const btn = document.getElementById("loginButton");
+    const errorBox = document.getElementById("errorBox");
+
+    errorBox.style.display = "none";
+    btn.disabled = true;
+    btn.textContent = "Checkin...";
+
+    const res = await fetch("/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password })
+    });
+
+    const data = await res.json();
+
+    btn.disabled = false;
+    btn.textContent = "Login";
+
+    if (!data.success) {
+      errorBox.textContent = "Login fehlgeschlagen.";
+      errorBox.style.display = "block";
+      return;
+    }
+
+    if (data.firstLogin) {
+      window.location.href = "/first-login";
+      return;
+    }
+
+    if (data.role === "superadmin") {
+      window.location.href = "/superadmin";
+      return;
+    }
+
+    if (data.role === "admin") {
+      window.location.href = "/admin";
+      return;
+    }
+
+    window.location.href = "/student";
+  }
+
+  document.addEventListener("keydown", e => {
+    if (e.key === "Enter") doLogin();
+  });
+</script>
+
+</body>
+</html>

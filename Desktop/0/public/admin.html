@@ -1,0 +1,1769 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Streets of Logic – Control Center</title>
+
+  <!-- Google Fonts für Comic-/GTA-Feeling -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    /* ================================
+       GLOBAL – Background & Base
+    ================================== */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      color: #f9fafb;
+      font-family: "Roboto", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(255,184,108,0.18) 0, transparent 50%),
+        radial-gradient(circle at 90% 20%, rgba(255,46,99,0.26) 0, transparent 55%),
+        radial-gradient(circle at 50% 100%, rgba(56,189,248,0.25) 0, transparent 60%),
+        #050816;
+    }
+
+    h1, h2, h3 {
+      margin-top: 0;
+    }
+
+    h1 {
+      font-family: "Bangers", cursive;
+      letter-spacing: 0.18em;
+      font-size: 30px;
+      text-transform: uppercase;
+      color: #fffbeb;
+      text-shadow: 0 0 6px rgba(0,0,0,0.9),
+                   0 0 18px rgba(255,212,128,0.9);
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-size: 20px;
+      margin-bottom: 8px;
+      letter-spacing: 0.04em;
+      color: #e5e7eb;
+    }
+
+    h3 {
+      font-size: 16px;
+      margin-bottom: 6px;
+      color: #e5e7eb;
+    }
+
+    /* ================================
+       SIDEBAR – Minimal GTA Comic
+    ================================== */
+    .sidebar {
+      width: 260px;
+      background:
+        radial-gradient(circle at top left, #111827 0, #020617 55%, #02010a 100%);
+      padding: 20px 16px;
+      border-right: 2px solid rgba(248,250,252,0.06);
+      box-shadow: 0 0 25px rgba(0,0,0,0.9);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .sidebar-logo-orb {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 30% 20%, #ffe066 0, #ff9800 25%, #f97316 40%, #7c2d12 70%, #020617 100%);
+      box-shadow:
+        0 0 12px rgba(255,224,102,1),
+        0 0 24px rgba(249,115,22,0.9);
+      border: 2px solid #111827;
+    }
+
+    .sidebar-title {
+      font-family: "Bangers", cursive;
+      font-size: 16px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #fef9c3;
+      text-shadow: 0 0 5px rgba(0,0,0,0.9);
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .sidebar-subtitle {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #9ca3af;
+      margin-top: 2px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      padding: 9px 11px;
+      margin-top: 6px;
+      border-radius: 999px;
+      cursor: pointer;
+      background: rgba(15,23,42,0.92);
+      border: 1px solid rgba(148,163,184,0.28);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.85);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border 0.15s ease, background 0.15s ease;
+    }
+
+    .nav-item svg {
+      width: 20px;
+      height: 20px;
+      margin-right: 8px;
+      fill: #f97316;
+      flex-shrink: 0;
+    }
+
+    .nav-label {
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .nav-item:hover {
+      transform: translateX(4px);
+      background: linear-gradient(120deg, rgba(248,250,252,0.08), rgba(15,23,42,0.97));
+      border-color: #f97316;
+      box-shadow:
+        0 5px 12px rgba(0,0,0,0.95),
+        0 0 12px rgba(249,115,22,0.7);
+    }
+    .nav-item.active {
+      background: linear-gradient(120deg, #f97316, #ec4899);
+      border-color: #facc15;
+      box-shadow:
+        0 5px 14px rgba(0,0,0,0.95),
+        0 0 16px rgba(249,115,22,0.9);
+    }
+
+    .nav-item.active .nav-label {
+      color: #0b1120;
+      font-weight: 600;
+    }
+
+    .nav-item.active svg {
+      fill: #0b1120;
+    }
+
+    /* Logout extra */
+    .nav-item-logout {
+      margin-top: auto;
+      background: linear-gradient(120deg, #dc2626, #b91c1c);
+      border-color: #fecaca;
+    }
+
+    .nav-item-logout svg {
+      fill: #fee2e2;
+    }
+
+    .nav-item-logout .nav-label {
+      color: #fef2f2;
+      font-weight: 600;
+    }
+
+    .nav-item-logout:hover {
+      background: linear-gradient(120deg, #f97373, #b91c1c);
+      box-shadow:
+        0 6px 14px rgba(0,0,0,0.96),
+        0 0 16px rgba(248,113,113,0.9);
+    }
+
+    /* ================================
+       CONTENT-BEREICH
+    ================================== */
+    .content {
+      flex-grow: 1;
+      height: 100vh;
+      padding: 20px 22px;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .content-inner {
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 16px;
+    }
+
+    .page-subtitle {
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #9ca3af;
+      opacity: 0.9;
+    }
+
+    .tab {
+      margin-bottom: 32px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* Panels im Comic-/GTA-HUD-Stil */
+    .panel {
+      background: rgba(15,23,42,0.94);
+      border-radius: 18px;
+      border: 2px solid rgba(15,23,42,1);
+      outline: 2px solid rgba(15,23,42,0.6);
+      box-shadow:
+        0 6px 20px rgba(0,0,0,0.95),
+        0 0 18px rgba(15,23,42,0.7);
+      padding: 16px 18px 18px 18px;
+      margin-bottom: 18px;
+      position: relative;
+    }
+
+    .panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 18px;
+      border: 1px solid rgba(248,250,252,0.03);
+      pointer-events: none;
+    }
+
+    .panel h3 {
+      margin-top: 0;
+      margin-bottom: 6px;
+      font-size: 15px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #e5e7eb;
+    }
+
+    .panel small {
+      font-size: 11px;
+      color: #9ca3af;
+    }
+
+    /* Inputs / Selects */
+    input, select {
+      padding: 6px 9px;
+      margin: 4px 4px 6px 0;
+      background: #020617;
+      color: #e5e7eb;
+      border-radius: 999px;
+      border: 1px solid #4b5563;
+      min-width: 150px;
+      font-size: 13px;
+      outline: none;
+      transition: border 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+
+    input:focus, select:focus {
+      border-color: #f97316;
+      background: #020617;
+      box-shadow: 0 0 0 1px rgba(249,115,22,0.7);
+    }
+
+    /* Buttons */
+    button.action {
+      border: none;
+      border-radius: 999px;
+      padding: 7px 14px;
+      margin: 4px 4px 6px 0;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 600;
+      cursor: pointer;
+      background: linear-gradient(120deg, #22c55e, #16a34a);
+      color: #020617;
+      box-shadow:
+        0 4px 12px rgba(0,0,0,0.9),
+        0 0 12px rgba(34,197,94,0.6);
+      transform: skewX(-7deg);
+      transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+    }
+
+    button.action:hover {
+      filter: brightness(1.05);
+      transform: skewX(-7deg) translateY(-1px);
+      box-shadow:
+        0 6px 16px rgba(0,0,0,0.95),
+        0 0 16px rgba(52,211,153,0.8);
+    }
+
+    button.delete {
+      border: none;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      background: linear-gradient(120deg, #ef4444, #b91c1c);
+      color: #fef2f2;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.9);
+      transform: skewX(-7deg);
+      transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+    }
+
+    button.delete:hover {
+      filter: brightness(1.05);
+      transform: skewX(-7deg) translateY(-1px);
+      box-shadow:
+        0 4px 10px rgba(0,0,0,0.95),
+        0 0 10px rgba(248,113,113,0.8);
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 8px;
+      margin-top: 8px;
+      font-size: 13px;
+    }
+    thead tr th {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #9ca3af;
+    }
+
+    table tbody tr {
+      background: radial-gradient(circle at top left, #020617 0, #0b1120 60%, #020617 100%);
+      border-radius: 12px;
+      border: 1px solid rgba(75,85,99,0.65);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.9);
+    }
+
+    table td, table th {
+      padding: 8px 12px;
+      vertical-align: middle;
+      text-align: left;
+    }
+
+    table tbody tr td:first-child {
+      border-radius: 12px 0 0 12px;
+    }
+
+    table tbody tr td:last-child {
+      border-radius: 0 12px 12px 0;
+    }
+
+    .thumb {
+      width: 55px;
+      height: 55px;
+      border-radius: 8px;
+      object-fit: cover;
+      cursor: pointer;
+      border: 2px solid #f97316;
+      box-shadow:
+        0 0 8px rgba(249,115,22,0.9),
+        0 2px 8px rgba(0,0,0,0.9);
+    }
+
+    /* Klassen-Fortschritt / Votingbar */
+    .progress-outer {
+      width: 100%;
+      max-width: 420px;
+      height: 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(250,204,21,0.8);
+      background: #020617;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .progress-inner {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg,#22c55e,#facc15,#f97316);
+      box-shadow: 0 0 12px rgba(250,204,21,0.85);
+      transition: width 0.3s ease;
+    }
+
+    /* Hint / Message Text */
+    .hint {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-top: 4px;
+    }
+
+    .msg-ok {
+      font-size: 12px;
+      color: #4ade80;
+      margin-top: 4px;
+    }
+
+    .msg-error {
+      font-size: 12px;
+      color: #fca5a5;
+      margin-top: 4px;
+    }
+
+    /* ================================
+       MODAL
+    ================================== */
+    #imgModal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.9);
+      backdrop-filter: blur(6px);
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    #imgModal-inner {
+      position: relative;
+      padding: 8px;
+      border-radius: 18px;
+      background: radial-gradient(circle at top, #020617 0, #020617 60%, #000 100%);
+      box-shadow:
+        0 10px 30px rgba(0,0,0,0.95),
+        0 0 22px rgba(15,23,42,1);
+    }
+
+    #modalImg {
+      max-width: 80vw;
+      max-height: 80vh;
+      border-radius: 12px;
+      border: 3px solid #f97316;
+      box-shadow:
+        0 0 20px rgba(249,115,22,0.9),
+        0 10px 30px rgba(0,0,0,0.95);
+    }
+
+    #modalDelete, #modalBack {
+      position: absolute;
+      top: 10px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: none;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    #modalDelete {
+      right: 10px;
+      background: linear-gradient(120deg, #ef4444, #b91c1c);
+      color: #fee2e2;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.95);
+    }
+
+    #modalBack {
+      left: 10px;
+      background: linear-gradient(120deg, #38bdf8, #0ea5e9);
+      color: #0b1120;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.95);
+    }
+
+    #modalDelete:hover, #modalBack:hover {
+      filter: brightness(1.05);
+      transform: translateY(-1px);
+    }
+
+    /* ================================
+       RESPONSIVE
+    ================================== */
+    @media (max-width: 900px) {
+      body {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        overflow-x: auto;
+      }
+      .nav-item {
+        flex: 0 0 auto;
+        margin-top: 4px;
+        margin-right: 6px;
+      }
+      .nav-item-logout {
+        margin-left: auto;
+      }
+      .content {
+        padding: 14px;
+        height: calc(100vh - 90px);
+      }
+      .content-inner {
+        max-width: 100%;
+      }
+      h1 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo-orb"></div>
+    <div>
+      <h2 class="sidebar-title">STREETS OF LOGIC</h2>
+      <div class="sidebar-subtitle">CONTROL&nbsp;CENTER</div>
+    </div>
+  </div>
+
+  <!-- XP ganz oben -->
+  <div class="nav-item active" onclick="showTab('xpTab', event)">
+    <svg viewBox="0 0 24 24"><path d="M5 3v18h2V3H5zm12 0v18h2V3h-2zM9 8v2h6V8H9zm0 6v2h4v-2H9z"/></svg>
+    <span class="nav-label">XP-Verwaltung</span>
+  </div>
+
+  <!-- KLASSEN-FORTSCHRITT / VOTING -->
+  <div class="nav-item" onclick="showTab('classProgressTab', event)">
+    <svg viewBox="0 0 24 24"><path d="M4 20h3v-7H4v7zm6 0h3V4h-3v16zm6 0h3v-4h-3v4z"/></svg>
+    <span class="nav-label">Klassen-Voting</span>
+  </div>
+
+  <div class="nav-item" onclick="showTab('classTab', event)">
+    <svg viewBox="0 0 24 24"><path d="M12 12c2.5 0 4.5-2 4.5-4.5S14.5 3 12 3 7.5 5 7.5 7.5 9.5 12 12 12zm0 1.5c-3 0-9 1.5-9 4.5V21h18v-3c0-3-6-4.5-9-4.5z"/></svg>
+    <span class="nav-label">Klassen & Schüler</span>
+  </div>
+
+  <div class="nav-item" onclick="showTab('missionTab', event)">
+    <svg viewBox="0 0 24 24"><path d="M3 3v18l9-4 9 4V3H3zm16 2v11.1l-7-3.1-7 3.1V5h14z"/></svg>
+    <span class="nav-label">Missionen</span>
+  </div>
+
+  <div class="nav-item" onclick="showTab('bonusTab', event)">
+    <svg viewBox="0 0 24 24"><path d="M4 6c0-.6.4-1 1-1h3c.6 0 1 .4 1 1v1c0 .6.4 1 1 1h3c.6 0 1-.4 1-1V6c0-.6.4-1 1-1h3c.6 0 1 .4 1 1v3.1c-.9.2-1.6.9-1.8 1.8-.2.9.1 1.9.8 2.5.3.3.6.5 1 .6V18c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1V15c.4-.1.7-.3 1-.6.7-.7 1-1.6.8-2.5-.2-.9-.9-1.6-1.8-1.8V6z"/></svg>
+    <span class="nav-label">Bonuskarten</span>
+  </div>
+
+  <div class="nav-item" onclick="showTab('characterTab', event)">
+    <svg viewBox="0 0 24 24"><path d="M12 2l4 4-4 4-4-4 4-4zm0 10c2.2 0 4 1.8 4 4s-1.8 4-4 4-4-1.8-4-4 1.8-4 4-4z"/></svg>
+    <span class="nav-label">Charaktere</span>
+  </div>
+
+  <div class="nav-item" onclick="showTab('levelTab', event)">
+    <svg viewBox="0 0 24 24"><path d="M4 21h16v-2H4v2zm2-4h12v-3H6v3zm3-5h6V4H9v8z"/></svg>
+    <span class="nav-label">Level</span>
+  </div>
+
+  <!-- Profil & Passwort -->
+  <div class="nav-item" onclick="showTab('profileTab', event)">
+    <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 110 10 5 5 0 010-10zm0 12c-3.3 0-7 1.7-7 4.5V20h14v-1.5C19 15.7 15.3 14 12 14zm6.7-3.7l1.3 1.3-4.9 4.9-2.1-2.1 1.3-1.3.8.8 3.6-3.6z"/></svg>
+    <span class="nav-label">Profil & Passwort</span>
+  </div>
+
+  <div class="nav-item nav-item-logout" onclick="logout()">
+    <svg viewBox="0 0 24 24"><path d="M16 13v-2H7V8l-5 4 5 4v-3h9zm3-10H9v2h10v14H9v2h10c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
+    <span class="nav-label">Logout</span>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+  <div class="content-inner">
+
+    <div class="page-header">
+      <div>
+        <h1>STREETS OF LOGIC</h1>
+        <div class="page-subtitle">XP EDITION – ADMIN CONTROL</div>
+      </div>
+    </div>
+
+    <!-- XP TAB -->
+    <div id="xpTab" class="tab">
+      <div class="panel">
+        <h2>XP-Verwaltung</h2>
+        <div class="hint">Wähle eine Klasse, markiere Schüler:innen und verteile XP direkt oder über Missionen.</div>
+
+        <div style="margin-top:8px;">
+          <label>Aktive Klasse:</label>
+          <select id="xpClassSelect" onchange="loadXPStudents()"></select>
+        </div>
+
+        <table id="xpStudentTable">
+          <thead>
+            <tr>
+              <th>Auswahl</th>
+              <th>Name</th>
+              <th>XP</th>
+              <th>Uploads</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="panel">
+        <h3>Direkte XP vergeben</h3>
+        <input id="xpValue" type="number" placeholder="XP" />
+        <button class="action" onclick="addXP()">XP an Auswahl</button>
+        <button class="action" onclick="addXPAll()">XP an alle</button>
+      </div>
+
+      <div class="panel">
+        <h3>XP über Missionen vergeben</h3>
+        <select id="xpMissionSelect"></select>
+        <button class="action" onclick="addMissionXP()">Mission an Auswahl</button>
+        <button class="action" onclick="addMissionXPAll()">Mission an alle</button>
+      </div>
+    </div>
+
+    <!-- KLASSEN-FORTSCHRITT & KLASSENBELOHNUNGEN (VOTING) -->
+    <div id="classProgressTab" class="tab hidden">
+      <div class="panel">
+        <h2>Klassen-Fortschritt & Voting</h2>
+        <div class="hint">
+          Du gibst für eine Klasse mehrere <b>Klassenbelohnungen</b> frei. Die Klasse stimmt in der Schüleransicht ab,
+          welche Belohnung sie möchte. Während die Klasse arbeitet, werden <b>XP gesammelt</b>; bei Erreichen der Ziel-XP
+          ist die gewählte Belohnung freigeschaltet.
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Aktuelle Voting-Runde</h3>
+        <div style="margin-bottom:8px;">
+          <label>Klasse:</label>
+          <select id="progressClassSelect" onchange="loadAdminClassProgress()"></select>
+        </div>
+
+        <div id="classProgressInfo" class="hint">–</div>
+
+        <div style="margin-top:12px;">
+          <h3>Neue Voting-Runde starten</h3>
+          <input id="classRoundTitle" placeholder="Titel (z.B. 'Belohnung bis Pfingsten')" />
+          <input id="classRoundTargetXp" type="number" placeholder="Ziel-XP für die Runde" />
+          <button class="action" onclick="startClassRewardRound()">Voting-Runde starten</button>
+          <button class="delete" onclick="stopClassRewardRound()">Voting stoppen</button>
+          <div class="hint">
+            Beim Start wird eine neue Runde für die gewählte Klasse angelegt. Alte Runden derselben Klasse werden automatisch geschlossen.
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Belohnungen in diese Runde aufnehmen</h3>
+        <div style="margin-bottom:6px;">
+          <label>Klassenbelohnung:</label>
+          <select id="classRewardSelect"></select>
+          <button class="action" onclick="addRewardOptionToRound()">Zur aktuellen Runde hinzufügen</button>
+        </div>
+        <div class="hint">
+          Wähle hier aus deinen angelegten <b>Klassenbelohnungen</b> (Kino, Frühstück, Spiele-Stunde …),
+          welche in der aktuellen Voting-Runde zur Auswahl stehen sollen.
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Neue Klassenbelohnung anlegen</h3>
+        <input id="classRewardName" placeholder="Name der Klassenbelohnung" />
+        <input id="classRewardXp" type="number" placeholder="Empfohlene Ziel-XP" />
+        <input type="file" id="classRewardImage" />
+        <button class="action" onclick="uploadClassRewardImage()">Bild hochladen</button>
+        <button class="action" onclick="addClassReward()">Speichern</button>
+        <p class="hint">
+          Beispiele: Kino-Nachmittag, Spiele-Stunde, Unterricht draußen, Klassenfrühstück …
+          Diese Belohnungen kannst du anschließend in Voting-Runden verwenden.
+        </p>
+      </div>
+
+      <div class="panel">
+        <h3>Alle Klassenbelohnungen</h3>
+        <table id="classRewardTable">
+          <thead>
+            <tr><th>Bild</th><th>Name</th><th>XP / Ziel</th><th>Löschen</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- KLASSEN & SCHÜLER -->
+    <div id="classTab" class="tab hidden">
+      <div class="panel">
+        <h2>Klassen & Schüler:innen</h2>
+      </div>
+
+      <div class="panel">
+        <h3>Neue Klasse anlegen</h3>
+        <input id="newClassName" placeholder="Klassenname" />
+        <button class="action" onclick="addClass()">Anlegen</button>
+      </div>
+
+      <div class="panel">
+        <h3>Klassenliste</h3>
+        <select id="classManageSelect" onchange="loadClassStudents()"></select>
+        <button class="delete" onclick="deleteClass()">Klasse löschen</button>
+        <!-- Passwortkarten-Button -->
+        <button class="action" onclick="printPasswordCards()">Passwortkarten drucken</button>
+
+        <table id="classStudentTable">
+          <thead>
+            <tr><th>Name</th><th>Passwort</th><th>Reset</th><th>Löschen</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="panel">
+        <h3>Schüler:in anlegen</h3>
+        <input id="studentName" placeholder="Name" />
+        <p class="hint">
+          Beim Anlegen wird automatisch ein einmaliges Passwort erzeugt (Erst-Login).
+        </p>
+        <button class="action" onclick="addStudent()">Anlegen</button>
+      </div>
+    </div>
+
+    <!-- MISSIONEN -->
+    <div id="missionTab" class="tab hidden">
+      <div class="panel">
+        <h2>Missionen</h2>
+      </div>
+
+      <div class="panel">
+        <h3>Neue Mission</h3>
+        <input id="missionName" placeholder="Name" />
+        <input id="missionXP" type="number" placeholder="XP" />
+        <label style="font-size:13px;margin-right:6px;">
+          <input type="checkbox" id="missionRequireUpload" /> Upload nötig?
+        </label><br>
+        <input type="file" id="missionImage" />
+        <button class="action" onclick="uploadMissionImage()">Bild hochladen</button>
+        <button class="action" onclick="addMission()">Speichern</button>
+      </div>
+
+      <div class="panel">
+        <h3>Alle Missionen</h3>
+        <table id="missionTable">
+          <thead>
+            <tr><th>Bild</th><th>Name</th><th>XP</th><th>Upload?</th><th>Löschen</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- BONUSKARTEN -->
+    <div id="bonusTab" class="tab hidden">
+      <div class="panel">
+        <h2>Bonuskarten</h2>
+      </div>
+
+      <div class="panel">
+        <h3>Neue Bonuskarte</h3>
+        <input id="bonusName" placeholder="Name" />
+        <input id="bonusXP" type="number" placeholder="XP" />
+        <input type="file" id="bonusImage" />
+        <button class="action" onclick="uploadBonusImage()">Bild hochladen</button>
+        <button class="action" onclick="addBonus()">Speichern</button>
+      </div>
+
+      <div class="panel">
+        <h3>Alle Bonuskarten</h3>
+        <table id="bonusTable">
+          <thead>
+            <tr><th>Bild</th><th>Name</th><th>XP</th><th>Löschen</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CHARAKTERE -->
+    <div id="characterTab" class="tab hidden">
+      <div class="panel">
+        <h2>Charaktere</h2>
+      </div>
+
+      <div class="panel">
+        <h3>Neuer Charakter</h3>
+        <input id="characterName" placeholder="Name" />
+        <input id="characterImage" type="file" />
+        <button class="action" onclick="uploadCharacterImage()">Bild hochladen</button>
+        <button class="action" onclick="addCharacter()">Speichern</button>
+      </div>
+
+      <div class="panel">
+        <h3>Alle Charaktere</h3>
+        <table id="characterTable">
+          <thead>
+            <tr><th>Bild</th><th>Name</th><th>Löschen</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- LEVEL -->
+    <div id="levelTab" class="tab hidden">
+      <div class="panel">
+        <h2>Level</h2>
+      </div>
+
+      <div class="panel">
+        <h3>Neues Level anlegen</h3>
+        <input id="levelName" placeholder="Levelname (z.B. Lehrling)" />
+        <input id="levelMinXp" type="number" placeholder="Mindest-XP" />
+        <button class="action" onclick="addLevel()">Speichern</button>
+
+        <p class="hint">
+          Hinweis: Das <b>erste Level</b> wird automatisch auf <b>0 XP</b> gesetzt – auch wenn du hier etwas anderes einträgst.
+        </p>
+      </div>
+
+      <div class="panel">
+        <h3>Alle Level</h3>
+        <table id="levelTable">
+          <thead>
+            <tr><th>Name</th><th>Mindest-XP</th><th>Löschen</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PROFIL & PASSWORT -->
+    <div id="profileTab" class="tab hidden">
+      <div class="panel">
+        <h2>Profil & Zugang</h2>
+        <p class="hint">
+          Hier siehst du deine Admin-Daten und kannst dein eigenes Passwort ändern.
+        </p>
+      </div>
+
+      <div class="panel">
+        <h3>Mein Profil</h3>
+        <p class="hint">
+          <b>Name:</b> <span id="profileName">–</span><br>
+          <b>Schule:</b> <span id="profileSchool">–</span>
+        </p>
+      </div>
+
+      <div class="panel">
+        <h3>Passwort ändern</h3>
+        <input id="adminCurrentPw" type="password" placeholder="Aktuelles Passwort" />
+        <input id="adminNewPw" type="password" placeholder="Neues Passwort" />
+        <input id="adminNewPw2" type="password" placeholder="Neues Passwort wiederholen" />
+        <button class="action" onclick="changeAdminPassword()">Passwort aktualisieren</button>
+        <div id="adminPwMsg" class="hint"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL -->
+<div id="imgModal">
+  <div id="imgModal-inner">
+    <img id="modalImg" src="">
+    <button id="modalDelete">Löschen</button>
+    <button id="modalBack" onclick="closeModal()">Zurück</button>
+  </div>
+</div>
+
+<script>
+/* ---------------------------- TABS ---------------------------- */
+function showTab(id, ev) {
+  // Inhalt
+  document.querySelectorAll(".tab").forEach(t => t.classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
+
+  // Sidebar-Active
+  document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+  if (ev && ev.currentTarget && !ev.currentTarget.classList.contains("nav-item-logout")) {
+    ev.currentTarget.classList.add("active");
+  }
+
+  if (id === "xpTab") loadXPInit();
+  if (id === "classTab") loadClassesForManage();
+  if (id === "missionTab") loadMissions();
+  if (id === "bonusTab") loadBonuses();
+  if (id === "characterTab") loadCharacters();
+  if (id === "levelTab") loadLevels();
+  if (id === "profileTab") loadAdminProfile();
+  if (id === "classProgressTab") loadClassProgressInit();
+}
+
+/* ---------------------------- LOGOUT ---------------------------- */
+async function logout() {
+  await fetch("/api/logout", { method: "POST" });
+  location.href = "/login.html";
+}
+
+/* ---------------------------- XP ---------------------------- */
+async function loadXPInit() {
+  const r = await fetch("/api/class");
+  const classes = await r.json();
+
+  const sel = document.getElementById("xpClassSelect");
+  sel.innerHTML = "";
+
+  if (classes.length === 0) return;
+
+  classes.forEach(c => {
+    const opt = document.createElement("option");
+    opt.value = c.id;
+    opt.textContent = c.name;
+    sel.appendChild(opt);
+  });
+
+  loadXPStudents();
+}
+
+async function loadXPStudents() {
+  const classId = document.getElementById("xpClassSelect").value;
+  if (!classId) return;
+
+  const r = await fetch(`/api/student?classId=${classId}`);
+  const students = await r.json();
+
+  const tbody = document.querySelector("#xpStudentTable tbody");
+  tbody.innerHTML = "";
+
+  students.forEach(s => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input type="checkbox" value="${s.id}"></td>
+      <td>${s.name}</td>
+      <td>${s.xp}</td>
+      <td id="uploadCell_${s.id}">—</td>
+    `;
+    tbody.appendChild(tr);
+
+    loadUploadsForStudent(s.id);
+  });
+
+  loadMissionsForXP();
+}
+
+function selectedStudentIds() {
+  return [...document.querySelectorAll("#xpStudentTable input[type=checkbox]:checked")]
+    .map(cb => Number(cb.value));
+}
+
+async function addXP() {
+  const xp = Number(document.getElementById("xpValue").value);
+  const ids = selectedStudentIds();
+  if (!xp || ids.length === 0) return;
+
+  for (let id of ids) {
+    await fetch("/api/xp", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({studentId:id, xp})
+    });
+  }
+  loadXPStudents();
+}
+
+async function addXPAll() {
+  const xp = Number(document.getElementById("xpValue").value);
+  if (!xp) return;
+
+  const classId = document.getElementById("xpClassSelect").value;
+  const r = await fetch(`/api/student?classId=${classId}`);
+  const students = await r.json();
+
+  for (let s of students) {
+    await fetch("/api/xp", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({studentId:s.id, xp})
+    });
+  }
+  loadXPStudents();
+}
+
+/* ---------------------------- XP MISSION ---------------------------- */
+async function loadMissionsForXP() {
+  const r = await fetch("/api/missions");
+  const missions = await r.json();
+
+  const sel = document.getElementById("xpMissionSelect");
+  sel.innerHTML = "";
+
+  missions.forEach(m => {
+    const opt = document.createElement("option");
+    opt.value = m.id;
+    opt.textContent = `${m.name} (+${m.xp} XP)`;
+    sel.appendChild(opt);
+  });
+}
+
+async function addMissionXP() {
+  const missionId = document.getElementById("xpMissionSelect").value;
+  const ids = selectedStudentIds();
+  if (!missionId || ids.length === 0) return;
+
+  for (let id of ids) {
+    await fetch("/api/xpmission", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({studentId:id, missionId})
+    });
+  }
+  loadXPStudents();
+}
+
+async function addMissionXPAll() {
+  const missionId = document.getElementById("xpMissionSelect").value;
+  const classId = document.getElementById("xpClassSelect").value;
+  if (!missionId || !classId) return;
+
+  const r = await fetch(`/api/student?classId=${classId}`);
+  const students = await r.json();
+
+  for (let s of students) {
+    await fetch("/api/xpmission", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({studentId:s.id, missionId})
+    });
+  }
+  loadXPStudents();
+}
+
+/* ---------------------------- UPLOADS + MODAL ---------------------------- */
+async function loadUploadsForStudent(studentId) {
+  const r = await fetch(`/api/uploads/${studentId}`);
+  const uploads = await r.json();
+
+  const cell = document.getElementById(`uploadCell_${studentId}`);
+  if (!cell) return;
+
+  if (uploads.length === 0) {
+    cell.innerHTML = "—";
+    return;
+  }
+
+  cell.innerHTML = uploads
+    .map(u => `
+      <img 
+        src="${u.image_url}" 
+        class="thumb" 
+        onclick="openModal('${u.image_url}', ${u.id})"
+      >
+    `)
+    .join("");
+}
+
+let currentUploadId = null;
+
+function openModal(url, uploadId) {
+  currentUploadId = uploadId;
+  document.getElementById("modalImg").src = url;
+  document.getElementById("imgModal").style.display = "flex";
+}
+
+function closeModal() {
+  document.getElementById("imgModal").style.display = "none";
+}
+
+async function deleteCurrentUpload() {
+  if (!currentUploadId) return;
+  await fetch(`/api/upload/delete/${currentUploadId}`, { method:"DELETE" });
+  closeModal();
+  loadXPStudents();
+}
+
+document.getElementById("modalDelete").onclick = deleteCurrentUpload;
+
+/* ---------------------------- KLASSEN ---------------------------- */
+async function loadClassesForManage() {
+  const r = await fetch("/api/class");
+  const classes = await r.json();
+
+  const sel = document.getElementById("classManageSelect");
+  sel.innerHTML = "";
+
+  classes.forEach(c => {
+    const opt = document.createElement("option");
+    opt.value = c.id;
+    opt.textContent = c.name;
+    sel.appendChild(opt);
+  });
+
+  if (classes.length > 0) sel.value = classes[0].id;
+  loadClassStudents();
+}
+
+async function addClass() {
+  const name = document.getElementById("newClassName").value.trim();
+  if (!name) return;
+
+  await fetch("/api/class", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({name})
+  });
+
+  document.getElementById("newClassName").value = "";
+  loadClassesForManage();
+  loadXPInit();
+}
+
+async function deleteClass() {
+  const id = document.getElementById("classManageSelect").value;
+  if (!id) return;
+
+  await fetch(`/api/class/${id}`, { method:"DELETE" });
+  loadClassesForManage();
+  loadXPInit();
+}
+
+async function loadClassStudents() {
+  const classId = document.getElementById("classManageSelect").value;
+  if (!classId) return;
+
+  const r = await fetch(`/api/student?classId=${classId}`);
+  const students = await r.json();
+
+  const tbody = document.querySelector("#classStudentTable tbody");
+  tbody.innerHTML = "";
+
+  students.forEach(s => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${s.name}</td>
+      <td id="pw_${s.id}">${s.password}</td>
+      <td><button class="action" onclick="resetStudentPassword(${s.id})">Reset</button></td>
+      <td><button class="delete" onclick="deleteStudent(${s.id})">X</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+/* Schüler anlegen */
+async function addStudent() {
+  const classId = document.getElementById("classManageSelect").value;
+  const name = document.getElementById("studentName").value.trim();
+  if (!classId || !name) return;
+
+  await fetch("/api/student", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({name, classId})
+  });
+
+  document.getElementById("studentName").value = "";
+  loadClassStudents();
+  loadXPStudents();
+}
+
+async function deleteStudent(id) {
+  await fetch(`/api/student/${id}`, { method:"DELETE" });
+  loadClassStudents();
+  loadXPStudents();
+}
+
+/* Passwort-Reset Schüler */
+async function resetStudentPassword(id) {
+  const r = await fetch("/api/student/resetPassword", {
+    method: "POST",
+    headers: { "Content-Type":"application/json" },
+    body: JSON.stringify({ studentId: id })
+  });
+  const data = await r.json();
+  if (data.success) {
+    const cell = document.getElementById(`pw_${id}`);
+    if (cell) cell.textContent = data.password;
+    alert(`Neues Passwort für die Schülerin/den Schüler: ${data.password}`);
+  }
+}
+
+/* Passwortkarten drucken */
+function printPasswordCards() {
+  const classId = document.getElementById("classManageSelect").value;
+  if (!classId) return;
+  window.open(`/password-cards.html?classId=${classId}`, "_blank");
+}
+
+/* ---------------------------- MISSIONEN ---------------------------- */
+let uploadedMissionImageUrl = null;
+
+async function uploadMissionImage() {
+  const file = document.getElementById("missionImage").files[0];
+  if (!file) return;
+
+  const form = new FormData();
+  form.append("image", file);
+
+  const r = await fetch("/api/missions/upload", { method:"POST", body: form });
+  const data = await r.json();
+  if (data.success) uploadedMissionImageUrl = data.url;
+}
+
+async function addMission() {
+  const name = document.getElementById("missionName").value.trim();
+  const xp = Number(document.getElementById("missionXP").value);
+  const requireUpload = document.getElementById("missionRequireUpload").checked;
+  if (!name || !xp) return;
+
+  await fetch("/api/missions", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({name, xp, imageUrl:uploadedMissionImageUrl, requireUpload})
+  });
+
+  uploadedMissionImageUrl = null;
+  document.getElementById("missionName").value = "";
+  document.getElementById("missionXP").value = "";
+  document.getElementById("missionRequireUpload").checked = false;
+  document.getElementById("missionImage").value = "";
+
+  loadMissions();
+  loadMissionsForXP();
+}
+
+async function loadMissions() {
+  const r = await fetch("/api/missions");
+  const missions = await r.json();
+
+  const tbody = document.querySelector("#missionTable tbody");
+  tbody.innerHTML = "";
+
+  missions.forEach(m => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${m.image_url ? `<img class="thumb" src="${m.image_url}">` : "—"}</td>
+      <td>${m.name}</td>
+      <td>${m.xp}</td>
+      <td>${m.require_upload ? "Ja" : "Nein"}</td>
+      <td><button class="delete" onclick="deleteMission(${m.id})">X</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+async function deleteMission(id) {
+  await fetch(`/api/missions/${id}`, { method:"DELETE" });
+  loadMissions();
+  loadMissionsForXP();
+}
+
+/* ---------------------------- BONUS ---------------------------- */
+let uploadedBonusImageUrl = null;
+
+async function uploadBonusImage() {
+  const file = document.getElementById("bonusImage").files[0];
+  if (!file) return;
+
+  const form = new FormData();
+  form.append("image", file);
+
+  const r = await fetch("/api/bonus/upload", { method:"POST", body: form });
+  const data = await r.json();
+  if (data.success) uploadedBonusImageUrl = data.url;
+}
+
+async function addBonus() {
+  const name = document.getElementById("bonusName").value.trim();
+  const xp = Number(document.getElementById("bonusXP").value);
+  if (!name || !xp) return;
+
+  await fetch("/api/bonus", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({name, xp, imageUrl:uploadedBonusImageUrl})
+  });
+
+  uploadedBonusImageUrl = null;
+  document.getElementById("bonusName").value = "";
+  document.getElementById("bonusXP").value = "";
+  document.getElementById("bonusImage").value = "";
+
+  loadBonuses();
+}
+
+async function loadBonuses() {
+  const r = await fetch("/api/bonus");
+  const bonuses = await r.json();
+
+  const tbody = document.querySelector("#bonusTable tbody");
+  tbody.innerHTML = "";
+
+  bonuses.forEach(b => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${b.image_url ? `<img class="thumb" src="${b.image_url}">` : "—"}</td>
+      <td>${b.name}</td>
+      <td>${b.xp}</td>
+      <td><button class="delete" onclick="deleteBonus(${b.id})">X</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+async function deleteBonus(id) {
+  await fetch(`/api/bonus/${id}`, { method:"DELETE" });
+  loadBonuses();
+}
+
+/* ---------------------------- CHARACTERS ---------------------------- */
+let uploadedCharacterImageUrl = null;
+
+async function uploadCharacterImage() {
+  const file = document.getElementById("characterImage").files[0];
+  if (!file) return;
+
+  const form = new FormData();
+  form.append("image", file);
+
+  const r = await fetch("/api/character/upload", { method:"POST", body: form });
+  const data = await r.json();
+  if (data.success) uploadedCharacterImageUrl = data.url;
+}
+
+async function addCharacter() {
+  const name = document.getElementById("characterName").value.trim();
+  if (!name) return;
+
+  await fetch("/api/character", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({name, imageUrl:uploadedCharacterImageUrl})
+  });
+
+  uploadedCharacterImageUrl = null;
+  document.getElementById("characterName").value = "";
+  document.getElementById("characterImage").value = "";
+
+  loadCharacters();
+}
+
+async function loadCharacters() {
+  const r = await fetch("/api/character");
+  const characters = await r.json();
+
+  const tbody = document.querySelector("#characterTable tbody");
+  tbody.innerHTML = "";
+
+  characters.forEach(c => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${c.image_url ? `<img class="thumb" src="${c.image_url}">` : "—"}</td>
+      <td>${c.name}</td>
+      <td><button class="delete" onclick="deleteCharacter(${c.id})">X</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+async function deleteCharacter(id) {
+  await fetch(`/api/character/${id}`, { method:"DELETE" });
+  loadCharacters();
+}
+
+/* ---------------------------- LEVELS ---------------------------- */
+async function loadLevels() {
+  const r = await fetch("/api/levels");
+  const levels = await r.json();
+
+  const tbody = document.querySelector("#levelTable tbody");
+  tbody.innerHTML = "";
+
+  levels.forEach(l => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${l.name}</td>
+      <td>${l.min_xp}</td>
+      <td><button class="delete" onclick="deleteLevel(${l.id})">X</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+async function addLevel() {
+  const name = document.getElementById("levelName").value.trim();
+  const minXp = Number(document.getElementById("levelMinXp").value);
+  if (!name || isNaN(minXp)) return;
+
+  await fetch("/api/levels", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({name, minXp})
+  });
+
+  document.getElementById("levelName").value = "";
+  document.getElementById("levelMinXp").value = "";
+  loadLevels();
+}
+
+async function deleteLevel(id) {
+  await fetch(`/api/levels/${id}`, { method:"DELETE" });
+  loadLevels();
+}
+
+/* ---------------------------- PROFIL & PASSWORT (ADMIN) ---------------------------- */
+async function loadAdminProfile() {
+  try {
+    const r = await fetch("/api/admin/me");
+    if (!r.ok) return;
+    const data = await r.json();
+
+    const nameEl = document.getElementById("profileName");
+    const schoolEl = document.getElementById("profileSchool");
+
+    if (nameEl) nameEl.textContent = data.name || "–";
+    if (schoolEl) schoolEl.textContent = data.school || "–";
+  } catch (err) {
+    console.error("Fehler beim Laden des Admin-Profils", err);
+  }
+}
+
+async function changeAdminPassword() {
+  const current = document.getElementById("adminCurrentPw").value.trim();
+  const neu = document.getElementById("adminNewPw").value.trim();
+  const neu2 = document.getElementById("adminNewPw2").value.trim();
+  const msgEl = document.getElementById("adminPwMsg");
+
+  if (!msgEl) return;
+  msgEl.className = "hint";
+  msgEl.textContent = "";
+
+  if (!current || !neu || !neu2) {
+    msgEl.className = "msg-error";
+    msgEl.textContent = "Bitte alle Felder ausfüllen.";
+    return;
+  }
+
+  if (neu !== neu2) {
+    msgEl.className = "msg-error";
+    msgEl.textContent = "Die neuen Passwörter stimmen nicht überein.";
+    return;
+  }
+
+  try {
+    const r = await fetch("/api/admin/change-password", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({ currentPassword: current, newPassword: neu })
+    });
+
+    const data = await r.json();
+
+    if (data.success) {
+      msgEl.className = "msg-ok";
+      msgEl.textContent = "Passwort erfolgreich aktualisiert.";
+      document.getElementById("adminCurrentPw").value = "";
+      document.getElementById("adminNewPw").value = "";
+      document.getElementById("adminNewPw2").value = "";
+    } else {
+      msgEl.className = "msg-error";
+      msgEl.textContent = data.message || "Fehler beim Aktualisieren des Passworts.";
+    }
+  } catch (err) {
+    console.error("Fehler beim Passwort-Update", err);
+    msgEl.className = "msg-error";
+    msgEl.textContent = "Technischer Fehler beim Passwort-Update.";
+  }
+}
+
+/* ---------------------------- KLASSEN-FORTSCHRITT / VOTING-RUNDEN ---------------------------- */
+let uploadedClassRewardImageUrl = null;
+let classRewardsCache = [];
+let currentRoundId = null;
+
+async function loadClassProgressInit() {
+  // Klassen laden
+  const r = await fetch("/api/class");
+  const classes = await r.json();
+
+  const sel = document.getElementById("progressClassSelect");
+  sel.innerHTML = "";
+
+  classes.forEach(c => {
+    const opt = document.createElement("option");
+    opt.value = c.id;
+    opt.textContent = c.name;
+    sel.appendChild(opt);
+  });
+
+  if (classes.length > 0) {
+    sel.value = classes[0].id;
+  }
+
+  await loadClassRewards();
+  await loadAdminClassProgress();
+}
+
+async function loadAdminClassProgress() {
+  const classId = document.getElementById("progressClassSelect").value;
+  const info = document.getElementById("classProgressInfo");
+  if (!classId) {
+    if (info) info.textContent = "Keine Klasse ausgewählt.";
+    return;
+  }
+
+  try {
+    const r = await fetch(`/api/admin/class-progress?classId=${classId}`);
+    const data = await r.json();
+    renderClassProgressInfo(data);
+  } catch (err) {
+    console.error("Fehler beim Laden des Klassenfortschritts", err);
+    if (info) info.textContent = "Fehler beim Laden des Klassenfortschritts.";
+  }
+}
+
+function renderClassProgressInfo(data) {
+  const info = document.getElementById("classProgressInfo");
+  if (!info) return;
+
+  const totalXp = data.total_xp ?? 0;
+
+  // Wenn keine Voting-Runde existiert
+  if (!data.round) {
+    currentRoundId = null;
+    info.innerHTML = `
+      <div style="font-size:13px;line-height:1.6;">
+        <b>Gesamt-XP der Klasse:</b> ${totalXp}<br>
+        <span style="opacity:0.85;">Es ist momentan <b>keine Voting-Runde</b> aktiv. Lege unten eine neue Voting-Runde an und füge Belohnungen hinzu.</span>
+      </div>
+    `;
+    return;
+  }
+
+  const round = data.round;
+  currentRoundId = round.id;
+
+  const target = round.target_xp || 0;
+  const current = totalXp;
+  const pct = target > 0 ? Math.min(100, Math.round((current / target) * 100)) : 0;
+
+  const options = data.options || [];
+
+  const optionsHtml = options.length === 0
+    ? `<div class="hint" style="margin-top:6px;">Für diese Runde sind noch <b>keine Belohnungs-Optionen</b> hinterlegt. Wähle unten welche aus.</div>`
+    : `
+      <div style="margin-top:10px;">
+        <b>Optionen in dieser Voting-Runde:</b>
+        <table style="margin-top:4px;">
+          <thead>
+            <tr>
+              <th>Bild</th>
+              <th>Name</th>
+              <th>Stimmen</th>
+              <th>Gewinner</th>
+              <th>Aktion</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${options.map(o => `
+              <tr>
+                <td>${o.image_url ? `<img class="thumb" src="${o.image_url}">` : "—"}</td>
+                <td>${o.name}</td>
+                <td>${o.votes}</td>
+                <td>${o.is_selected ? "✅" : ""}</td>
+                <td>
+                  <button class="action" onclick="fixClassRewardOption(${o.id})">
+                    Als Gewinner fixieren
+                  </button>
+                </td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
+    `;
+
+  const statusText = round.fixed_option_id
+    ? `<span style="color:#4ade80;"><b>Gewinner ist festgelegt.</b></span>`
+    : round.is_active
+      ? `<span style="color:#facc15;"><b>Voting läuft noch.</b></span>`
+      : `<span style="color:#f97316;"><b>Voting gestoppt, aber kein Gewinner fixiert.</b></span>`;
+
+  const targetInfo = target > 0
+    ? `Ziel: ${target} XP &nbsp; | &nbsp; aktuell: ${current} XP`
+    : `Kein Ziel definiert (XP werden trotzdem gesammelt).`;
+
+  info.innerHTML = `
+    <div style="font-size:13px;line-height:1.6;">
+      <b>Gesamt-XP der Klasse:</b> ${totalXp}<br>
+      <b>Voting-Runde:</b> ${round.title || "ohne Titel"}<br>
+      ${targetInfo}
+      <div class="progress-outer">
+        <div class="progress-inner" style="width:${pct}%"></div>
+      </div>
+      <div class="hint" style="margin-top:4px;">
+        Fortschritt: ${pct}% – sobald das Ziel erreicht ist, ist die aktuell gewählte Belohnung freigeschaltet.
+      </div>
+      <div style="margin-top:6px;">
+        ${statusText}
+        ${round.hasReachedTarget ? `<br><span style="color:#4ade80;">Die Klasse hat die Ziel-XP erreicht.</span>` : ""}
+      </div>
+      ${optionsHtml}
+    </div>
+  `;
+}
+
+async function uploadClassRewardImage() {
+  const file = document.getElementById("classRewardImage").files[0];
+  if (!file) return;
+
+  const form = new FormData();
+  form.append("image", file);
+
+  const r = await fetch("/api/class/rewards/upload", {
+    method: "POST",
+    body: form
+  });
+  const data = await r.json();
+  if (data.success) {
+    uploadedClassRewardImageUrl = data.url;
+  }
+}
+
+async function addClassReward() {
+  const name = document.getElementById("classRewardName").value.trim();
+  const xp = Number(document.getElementById("classRewardXp").value);
+  if (!name || !xp) return;
+
+  await fetch("/api/class/rewards", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ name, xp, imageUrl: uploadedClassRewardImageUrl })
+  });
+
+  uploadedClassRewardImageUrl = null;
+  document.getElementById("classRewardName").value = "";
+  document.getElementById("classRewardXp").value = "";
+  document.getElementById("classRewardImage").value = "";
+
+  await loadClassRewards();
+}
+
+async function loadClassRewards() {
+  const r = await fetch("/api/class/rewards");
+  const rewards = await r.json();
+  classRewardsCache = rewards;
+
+  // Select für Voting-Runden
+  const sel = document.getElementById("classRewardSelect");
+  sel.innerHTML = "";
+  rewards.forEach(b => {
+    const opt = document.createElement("option");
+    opt.value = b.id;
+    opt.textContent = `${b.name} (${b.xp} XP)`;
+    sel.appendChild(opt);
+  });
+
+  // Tabelle
+  const tbody = document.querySelector("#classRewardTable tbody");
+  tbody.innerHTML = "";
+  rewards.forEach(b => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${b.image_url ? `<img class="thumb" src="${b.image_url}">` : "—"}</td>
+      <td>${b.name}</td>
+      <td>${b.xp}</td>
+      <td><button class="delete" onclick="deleteClassReward(${b.id})">X</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+async function deleteClassReward(id) {
+  await fetch(`/api/class/rewards/${id}`, { method:"DELETE" });
+  await loadClassRewards();
+}
+
+// Neue Voting-Runde starten
+async function startClassRewardRound() {
+  const classId = document.getElementById("progressClassSelect").value;
+  const title = document.getElementById("classRoundTitle").value.trim();
+  const targetXp = Number(document.getElementById("classRoundTargetXp").value);
+  if (!classId || !targetXp) return;
+
+  await fetch("/api/admin/class-reward-round", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ classId, title, targetXp })
+  });
+
+  document.getElementById("classRoundTitle").value = "";
+  document.getElementById("classRoundTargetXp").value = "";
+
+  await loadAdminClassProgress();
+}
+
+// Voting stoppen
+async function stopClassRewardRound() {
+  if (!currentRoundId) return;
+
+  await fetch(`/api/admin/class-reward-round/${currentRoundId}/stop`, {
+    method: "POST"
+  });
+
+  await loadAdminClassProgress();
+}
+
+// Belohnung aus Pool in aktuelle Runde aufnehmen
+async function addRewardOptionToRound() {
+  if (!currentRoundId) {
+    alert("Es ist keine aktive Voting-Runde für diese Klasse angelegt.");
+    return;
+  }
+
+  const rewardId = document.getElementById("classRewardSelect").value;
+  if (!rewardId) return;
+
+  const reward = classRewardsCache.find(r => String(r.id) === String(rewardId));
+  if (!reward) return;
+
+  await fetch("/api/admin/class-reward-option", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({
+      roundId: currentRoundId,
+      name: reward.name,
+      imageUrl: reward.image_url || null
+    })
+  });
+
+  await loadAdminClassProgress();
+}
+
+// Option als Gewinner fixieren
+async function fixClassRewardOption(optionId) {
+  if (!currentRoundId || !optionId) return;
+
+  await fetch(`/api/admin/class-reward-round/${currentRoundId}/fix`, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ optionId })
+  });
+
+  await loadAdminClassProgress();
+}
+
+/* Default Ansicht */
+showTab("xpTab");
+</script>
+
+</body>
+</html>

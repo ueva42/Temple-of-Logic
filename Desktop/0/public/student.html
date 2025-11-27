@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Streets of Logic – XP Edition</title>
+
+  <!-- GTA-ähnliche Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Bangers&display=swap" rel="stylesheet">
+
+  <style>
+/* ============================================
+   GLOBAL – Dark GTA HUD / Neon City Background
+============================================ */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(circle at 10% 0%, rgba(255,184,108,0.18) 0, transparent 50%),
+    radial-gradient(circle at 90% 20%, rgba(255,46,99,0.26) 0, transparent 55%),
+    radial-gradient(circle at 50% 100%, rgba(56,189,248,0.25) 0, transparent 60%),
+    #050816;
+  color: #f9fafb;
+  font-family: Arial, sans-serif;
+  display: flex;
+  overflow: hidden;
+  transition: margin-left 0.3s ease;
+}
+
+a { color: inherit; }
+
+/* ============================================
+   LOADING SCREEN – Optimiert (3.1s)
+============================================ */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, #020617 0%, #111827 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  opacity: 1;
+  transition: opacity 0.8s ease;
+}
+
+.loading-overlay.hide {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loading-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.03) 0px,
+    rgba(255,255,255,0.03) 1px,
+    rgba(0,0,0,0.05) 2px
+  );
+  animation: scanMove 8s linear infinite;
+  opacity: 0.35;
+}
+
+@keyframes scanMove {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(-100%); }
+}
+
+.loading-content {
+  text-align: center;
+  max-width: 780px;
+  width: 90%;
+}
+
+.loading-image {
+  max-width: 100%;
+  border-radius: 22px;
+  margin: 0 auto 20px auto;
+
+  opacity: 0;
+  animation: loaderImageFade 5.6s ease forwards;
+
+  box-shadow:
+    0 0 0 4px rgba(0,0,0,0.8),
+    0 0 22px #f97316,
+    0 0 44px rgba(249,115,22,0.5),
+    0 0 70px rgba(249,115,22,0.25);
+}
+
+@keyframes loaderImageFade {
+  0%   { opacity: 0; }
+  15%  { opacity: 1; }    
+  85%  { opacity: 1; }     
+  100% { opacity: 0; }     
+}
+
+.loading-bar {
+  width: 80%;
+  max-width: 540px;
+  height: 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.4);
+  background: rgba(8,15,30,0.95);
+  margin: 0 auto;
+  overflow: hidden;
+  box-shadow:
+    0 0 10px rgba(255,255,255,0.4),
+    0 0 25px rgba(252,211,77,0.25);
+}
+
+.loading-bar-fill {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg,
+    #22c55e,
+    #a3e635,
+    #facc15,
+    #fb923c,
+    #f97316,
+    #c084fc
+  );
+  box-shadow: 0 0 20px rgba(249,115,22,0.95);
+  animation: loadingA 3s ease-in-out forwards;
+}
+
+@keyframes loadingA {
+  0%   { width: 0%; }
+  20%  { width: 35%; }
+  50%  { width: 70%; }
+  75%  { width: 85%; }
+  100% { width: 100%; }
+}
+
+.loading-hint {
+  margin-top: 12px;
+  font-size: 14px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #e5e7eb;
+  opacity: 0.92;
+  text-shadow: 0 0 6px rgba(255,255,255,0.25);
+}
+
+/* ============================================
+   SIDEBAR – GTA Comic Style
+============================================ */
+.sidebar {
+  width: 270px;
+  background:
+    radial-gradient(circle at top left, #020617 0, #020617 40%, #030712 100%);
+  border-right: 2px solid rgba(148,163,184,0.45);
+  box-shadow: 0 0 35px rgba(0,0,0,0.95);
+  padding: 18px 18px 20px 18px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 15;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.sidebar-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid #f97316;
+  box-shadow:
+    0 0 14px rgba(249,115,22,0.9),
+    0 0 26px rgba(15,23,42,0.9);
+  background: radial-gradient(circle at 30% 20%, #0ea5e9, #4f46e5 60%, #020617 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 18px;
+  text-transform: uppercase;
+}
+
+.sidebar-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.sidebar-title-wrap {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.sidebar-title {
+  margin: 0;
+  font-family: "Bangers", system-ui;
+  font-size: 20px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #fef9c3;
+  text-shadow:
+    -2px -2px 0 #000,
+    2px -2px 0 #000,
+    -2px 2px 0 #000,
+    2px 2px 0 #000,
+    0 0 16px rgba(251,191,36,0.95);
+}
+
+.sidebar-subtitle {
+  margin-top: 4px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: #9ca3af;
+  opacity: 0.9;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  margin-top: 8px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  background: radial-gradient(circle at left, #111827 0, #020617 60%);
+  border: 1px solid rgba(148,163,184,0.45);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.9);
+  transition: 0.18s ease;
+}
+
+.menu-item:hover {
+  transform: translateX(4px);
+  border-color: #f97316;
+  box-shadow:
+    0 8px 20px rgba(15,23,42,0.95),
+    0 0 14px rgba(249,115,22,0.75);
+}
+
+.menu-item.active {
+  background: linear-gradient(120deg, #f97316, #a855f7);
+  border-color: #facc15;
+  box-shadow:
+    0 0 22px rgba(251,191,36,0.9),
+    0 10px 26px rgba(0,0,0,0.95);
+  color: #0f172a;
+}
+
+.menu-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  background: rgba(15,23,42,0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.menu-label {
+  white-space: nowrap;
+}
+
+.logout-btn {
+  margin-top: auto;
+  margin-bottom: 4px;
+  padding: 9px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(248,113,113,0.65);
+  background: linear-gradient(135deg, #111827, #b91c1c);
+  color: #fee2e2;
+  cursor: pointer;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.9);
+  transition: 0.18s ease;
+}
+
+.logout-btn:hover {
+  background: linear-gradient(135deg, #7f1d1d, #ef4444);
+  box-shadow: 0 0 18px rgba(248,113,113,0.9);
+  transform: translateY(-1px);
+}
+
+/* ============================================
+   MOBILE HEADER
+============================================ */
+.mobile-header {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 58px;
+  background: linear-gradient(90deg, #020617, #0b1120);
+  border-bottom: 1px solid rgba(148,163,184,0.45);
+  backdrop-filter: blur(10px);
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  z-index: 20;
+}
+
+.mobile-title {
+  font-family: "Bangers", system-ui;
+  font-size: 18px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #f9fafb;
+  text-shadow:
+    -2px -2px 0 #000,
+    2px -2px 0 #000,
+    -2px 2px 0 #000,
+    2px 2px 0 #
+000,
+    0 0 22px rgba(249,115,22,0.9);
+}
+
+.burger {
+  width: 26px;
+  height: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.burger span {
+  height: 3px;
+  border-radius: 999px;
+  background: #e5e7eb;
+}
+
+.mobile-logout-btn {
+  border: 1px solid rgba(148,163,184,0.7);
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 11px;
+  background: #020617;
+  color: #e5e7eb;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+/* ============================================
+   MAIN AREA
+============================================ */
+.main-area {
+  flex: 1;
+  padding: 28px 40px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+h1 {
+  font-family: "Bangers", system-ui;
+  font-size: 30px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  margin-top: 0;
+  margin-bottom: 22px;
+  color: #f9fafb;
+  text-shadow:
+    -3px -3px 0 #000,
+    3px -3px 0 #000,
+    -3px 3px 0 #000,
+    3px 3px 0 #000,
+    0 0 22px rgba(249,115,22,0.9);
+}
+
+h2 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-family: "Bebas Neue", system-ui;
+  font-size: 22px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #e5e7eb;
+  border-bottom: 1px solid rgba(148,163,184,0.55);
+  padding-bottom: 4px;
+}
+
+.card {
+  background: linear-gradient(145deg, rgba(15,23,42,0.94), rgba(15,23,42,0.97));
+  padding: 18px;
+  border-radius: 18px;
+  margin-bottom: 26px;
+  border: 1px solid rgba(148,163,184,0.6);
+  box-shadow:
+    0 14px 40px rgba(15,23,42,0.98),
+    0 0 24px rgba(15,23,42,0.9);
+  backdrop-filter: blur(8px);
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at top left, rgba(251,191,36,0.12), transparent 60%),
+    radial-gradient(circle at bottom right, rgba(59,130,246,0.16), transparent 60%);
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.section {
+  animation: fadeIn 0.25s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================
+   CHARACTER IMAGE
+============================================ */
+.character-wrapper {
+  display: flex;
+  gap: 22px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.char-img-wrapper {
+  position: relative;
+  width: 220px;
+}
+
+.char-img {
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  box-shadow:
+    0 0 0 4px #020617,
+    0 0 0 6px #f97316,
+    0 0 22px rgba(249,115,22,0.9);
+}
+
+.char-name {
+  margin-top: 10px;
+  font-family: "Bebas Neue", system-ui;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 18px;
+}
+
+.char-traits {
+  flex: 1;
+  min-width: 220px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.char-traits b {
+  font-family: "Bebas Neue", system-ui;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 15px;
+}
+
+/* ============================================
+   LEVEL BAR
+============================================ */
+.level-step-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.level-step {
+  width: 62px;
+  height: 11px;
+  background: #020617;
+  border-radius: 999px;
+  border: 1px solid rgba(148,163,184,0.7);
+  overflow: hidden;
+}
+
+.level-step-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #22c55e, #facc15);
+  width: 0%;
+  transition: width 0.35s ease;
+}
+
+.level-step-star {
+  font-size: 18px;
+  color: #facc15;
+  text-shadow: 0 0 10px rgba(250,204,21,0.95);
+}
+
+/* ============================================
+   CAROUSEL
+============================================ */
+.carousel-wrapper {
+  position: relative;
+  width: 320px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.carousel-item {
+  display: none;
+}
+
+.carousel-item.active {
+  display: block;
+}
+
+.mission-img {
+  width: 230px;
+  height: 230px;
+  border-radius: 30px;
+  object-fit: cover;
+  margin-bottom: 10px;
+  box-shadow:
+    0 0 0 4px #020617,
+    0 0 0 5px #a855f7,
+    0 0 24px rgba(168,85,247,0.9);
+}
+
+.carousel-arrow {
+  font-size: 30px;
+  cursor: pointer;
+  user-select: none;
+  padding: 6px 12px;
+  color: #e5e7eb;
+  transition: 0.2s;
+}
+
+.carousel-arrow:hover {
+  color: #f97316;
+  text-shadow: 0 0 14px rgba(249,115,22,0.9);
+}
+
+.dot-container {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #4b5563;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.dot.active {
+  background: #f97316;
+  box-shadow: 0 0 8px rgba(249,115,22,0.9);
+}
+
+/* ============================================
+   FILE UPLOAD
+============================================ */
+.file-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.file-input {
+  display: none;
+}
+
+.file-label {
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid #f97316;
+  background: #020617;
+  color: #f9fafb;
+  font-size: 12px;
+  cursor: pointer;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: 0.18s ease;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.85);
+}
+
+.file-label:hover {
+  background: #111827;
+  box-shadow: 0 0 16px rgba(249,115,22,0.9);
+  transform: translateY(-1px);
+}
+
+.file-name {
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+.btn-primary {
+  border: none;
+  margin-top: 4px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #22c55e, #a855f7);
+  color: #0f172a;
+  font-size: 12px;
+  cursor: pointer;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  box-shadow: 0 8px 20px rgba(8,47,73,0.95);
+  transition: 0.18s ease;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #4ade80, #f97316);
+  box-shadow: 0 0 18px rgba(45,212,191,0.9);
+  transform: translateY(-1px);
+}
+
+/============================================
+   XP LOG
+============================================ */
+.xp-entry {
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(148,163,184,0.4);
+  font-size: 13px;
+}
+
+.xp-entry b {
+  color: #facc15;
+}
+
+/* ============================================
+   CHARACTER SELECT OVERLAY
+============================================ */
+.character-overlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at top, rgba(15,23,42,0.98), rgba(3,7,18,0.98));
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 40;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.character-overlay-inner {
+  max-width: 1000px;
+  width: 100%;
+  max-height: 90vh;
+  background: linear-gradient(145deg, rgba(15,23,42,0.96), rgba(15,23,42,0.99));
+  border-radius: 24px;
+  border: 1px solid rgba(251,191,36,0.7);
+  box-shadow:
+    0 0 34px rgba(251,191,36,0.35),
+    0 20px 60px rgba(0,0,0,0.95);
+  padding: 20px 24px 24px 24px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  position: relative;
+}
+
+.character-overlay-title {
+  font-family: "Bangers", system-ui;
+  font-size: 26px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  text-align: center;
+  margin: 0 0 8px 0;
+  color: #fef9c3;
+  text-shadow:
+    -2px -2px 0 #000,
+    2px -2px 0 #000,
+    -2px 2px 0 #000,
+    2px 2px 0 #000,
+    0 0 16px rgba(251,191,36,0.95);
+}
+
+.character-overlay-sub {
+  text-align: center;
+  font-size: 13px;
+  color: #e5e7eb;
+  opacity: 0.9;
+  margin-bottom: 14px;
+}
+
+.character-choice-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.character-choice-card {
+  width: 150px;
+  cursor: pointer;
+  text-align: center;
+  padding: 10px 10px 12px 10px;
+  border-radius: 20px;
+  background: radial-gradient(circle at top, #020617, #020617 55%, #030712 100%);
+  border: 1px solid rgba(148,163,184,0.7);
+  box-shadow:
+    0 8px 24px rgba(0,0,0,0.9),
+    0 0 14px rgba(15,23,42,0.95);
+  transition: 0.18s ease;
+}
+
+.character-choice-card:hover {
+  transform: translateY(-4px) scale(1.03);
+  border-color: #f97316;
+  box-shadow:
+    0 10px 28px rgba(0,0,0,0.95),
+    0 0 18px rgba(249,115,22,0.85);
+}
+
+.character-choice-img-wrap {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 8px auto;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 3px #020617,
+    0 0 0 4px #f97316,
+    0 0 20px rgba(249,115,22,0.9);
+}
+
+.character-choice-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.character-choice-name {
+  font-family: "Bebas Neue", system-ui;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 14px;
+  color: #e5e7eb;
+}
+
+.character-overlay-close {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  font-size: 22px;
+  cursor: pointer;
+  color: #9ca3af;
+  text-shadow: 0 0 6px #000;
+  display: none;
+}
+
+/* ============================================
+   RESPONSIVE
+============================================ */
+@media (max-width: 900px) {
+  body {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -290px;
+    bottom: 0;
+    height: 100%;
+    transition: left 0.3s ease;
+  }
+
+  body.menu-open .sidebar {
+    left: 0;
+  }
+
+  .mobile-header {
+    display: flex;
+  }
+
+  .main-area {
+    padding: 72px 16px 20px 16px;
+  }
+
+  h1 {
+    display: none;
+  }
+
+  .character-wrapper {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .carousel-wrapper {
+    width: 100%;
+  }
+
+  .character-overlay-inner {
+    padding: 14px 12px 18px 12px;
+  }
+
+  .character-choice-card {
+    width: 130px;
+  }
+
+  .loading-image {
+    border-radius: 18px;
+  }
+
+  .loading-hint {
+    font-size: 11px;
+  }
+}
+  </style>
+</head>
+
+<body>
+
+<!-- LOADING OVERLAY -->
+<div id="loadingOverlay" class="loading-overlay">
+  <div class="loading-content">
+    <img src="assets/loading-screen.png" alt="Streets of Logic Loading" class="loading-image">
+    <div class="loading-bar">
+      <div class="loading-bar-fill"></div>
+    </div>
+    <div class="loading-hint">
+      Lädt deine Streets of Logic – XP-Daten …
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE HEADER -->
+<div class="mobile-header">
+  <div class="burger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
+  <div class="mobile-title">STREETS OF LOGIC</div>
+  <button class="mobile-logout-btn" onclick="logout()">Logout</button>
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-avatar">
+      <img id="sidebarAvatar" src="" alt="" style="display:none;">
+      <span id="sidebarInitials" style="display:none;">SL</span>
+    </div>
+    <div class="sidebar-title-wrap">
+      <h2 class="sidebar-title">STREETS OF LOGIC</h2>
+      <span class="sidebar-subtitle">XP EDITION</span>
+    </div>
+  </div>
+
+  <div class="menu-item active" onclick="showSection(event,'status')">
+    <div class="menu-icon">S</div>
+    <span class="menu-label">Status</span>
+  </div>
+
+  <div class="menu-item" onclick="showSection(event,'charakter')">
+    <div class="menu-icon">C</div>
+    <span class="menu-label">Charakter</span>
+  </div>
+
+  <div class="menu-item" onclick="showSection(event,'missionen')">
+    <div class="menu-icon">M</div>
+    <span class="menu-label">Missionen</span>
+  </div>
+
+  <div class="menu-item" onclick="showSection(event,'belohnungen')">
+    <div class="menu-icon">B</div>
+    <span class="menu-label">Belohnungen</span>
+  </div>
+
+  <div class="menu-item" onclick="showSection(event,'xp')">
+    <div class="menu-icon">XP</div>
+    <span class="menu-label">XP-Historie</span>
+  </div>
+
+  <button class="logout-btn" onclick="logout()">Logout</button>
+</div>
+
+<!-- MAIN AREA -->
+<div class="main-area">
+  <h1>STREETS OF LOGIC – XP EDITION</h1>
+
+  <!-- STATUS -->
+  <div id="status-section" class="card section">
+    <h2>Status</h2>
+
+    <!-- Persönlicher Status -->
+    <div id="userCard"></div>
+    <div id="levelBar" style="margin-top:10px;margin-bottom:25px;"></div>
+
+    <!-- Klassenbelohnung / Voting – neu hier -->
+    <h2 style="font-size:20px;margin-top:0;">Klassen-Belohnung</h2>
+    <div id="classChallenge"></div>
+  </div>
+
+  <!-- CHARAKTER -->
+  <div id="charakter-section" class="card section" style="display:none;">
+    <h2>Charakter</h2>
+    <div class="character-wrapper">
+      <div class="char-img-wrapper">
+        <div id="characterInfo"></div>
+      </div>
+      <div id="traitsItemsCard" class="char-traits"></div>
+    </div>
+  </div>
+
+  <!-- MISSIONEN -->
+  <div id="missionen-section" class="card section" style="display:none;">
+    <h2>Missionen</h2>
+    <div id="missionCarousel"></div>
+  </div>
+
+  <!-- BELOHNUNGEN -->
+  <div id="belohnungen-section" class="card section" style="display:none;">
+    <h2>Belohnungen</h2>
+
+    <!-- Persönliche Bonuskarten -->
+    <div style="margin-bottom:16px;font-size:13px;opacity:0.85;">
+      <b>Deine Bonuskarten</b> – Belohnungen, die du mit deinen persönlichen XP einlösen kannst.
+    </div>
+
+    <div id="rewardCarousel"></div>
+  </div>
+
+  <!-- XP HISTORIE -->
+  <div id="xp-section" class="card section" style="display:none;">
+    <h2>XP-Historie</h2>
+    <div id="xpLog"></div>
+  </div>
+</div>
+<!-- CHARACTER SELECT OVERLAY -->
+<div id="characterOverlay" class="character-overlay">
+  <div class="character-overlay-inner">
+    <h2 class="character-overlay-title">WÄHLE DEINEN CHARAKTER</h2>
+    <div class="character-overlay-sub">
+      Klicke auf ein Bild, um deinen Charakter festzulegen.
+    </div>
+    <div id="characterChoices" class="character-choice-grid"></div>
+  </div>
+</div>
+
+<script>
+/* ============================================
+   LOADING OVERLAY CONTROL – Optimiert
+============================================ */
+function hideLoader() {
+  const overlay = document.getElementById("loadingOverlay");
+  if (!overlay) return;
+
+  overlay.classList.add("hide");
+
+  setTimeout(() => {
+    overlay.style.display = "none";
+  }, 900);
+}
+
+window.addEventListener("load", () => {
+  const img = document.querySelector(".loading-image");
+
+  if (!img) {
+    setTimeout(hideLoader, 5000);
+    return;
+  }
+
+  img.onload = () => {
+    const total = 4800; 
+    setTimeout(hideLoader, total);
+  };
+
+  if (img.complete) img.onload();
+});
+
+setTimeout(hideLoader, 7000);
+
+
+/* ============================================
+   MENU
+============================================ */
+function toggleMenu() {
+  document.body.classList.toggle("menu-open");
+}
+
+function showSection(ev, name) {
+  document.querySelectorAll(".section").forEach(s => s.style.display = "none");
+
+  const section = document.getElementById(name + "-section");
+  if (section) section.style.display = "block";
+
+  document.querySelectorAll(".menu-item").forEach(i => i.classList.remove("active"));
+  if (ev) ev.target.closest(".menu-item").classList.add("active");
+
+  if (window.innerWidth <= 900) {
+    document.body.classList.remove("menu-open");
+  }
+}
+
+
+/* ============================================
+   LOGOUT
+============================================ */
+async function logout() {
+  await fetch("/api/logout", { method: "POST" });
+  location.href = "/login.html";
+}
+
+
+/* ============================================
+   CHARACTER OVERLAY
+============================================ */
+let characterListLoaded = false;
+
+async function openCharacterOverlay() {
+  const overlay = document.getElementById("characterOverlay");
+  overlay.style.display = "flex";
+
+  if (!characterListLoaded) {
+    try {
+      const r = await fetch("/api/student/characterList");
+      const chars = await r.json();
+      renderCharacterChoices(chars);
+      characterListLoaded = true;
+    } catch (e) {
+      console.error(e);
+      document.getElementById("characterChoices").innerHTML =
+        "<p>Fehler beim Laden der Charaktere.</p>";
+    }
+  }
+}
+
+function renderCharacterChoices(chars) {
+  const c = document.getElementById("characterChoices");
+  c.innerHTML = "";
+
+  if (!chars.length) {
+    c.innerHTML = "<p>Keine Charaktere angelegt.</p>";
+    return;
+  }
+
+  chars.forEach(ch => {
+    const card = document.createElement("div");
+    card.className = "character-choice-card";
+
+    card.innerHTML = `
+      <div class="character-choice-img-wrap">
+        <img src="${ch.image_url}" alt="${ch.name}">
+      </div>
+      <div class="character-choice-name">${ch.name}</div>
+    `;
+
+    card.onclick = () => selectCharacter(ch.id);
+    c.appendChild(card);
+  });
+}
+
+async function selectCharacter(characterId) {
+  const r = await fetch("/api/student/selectCharacter", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ characterId })
+  });
+
+  const data = await r.json();
+  if (data.success) {
+    location.reload();
+  } else {
+    alert(data.message || "Fehler beim Speichern.");
+  }
+}
+
+
+/* ============================================
+   STUDENT DATA
+============================================ */
+let xpPerMission = {};
+
+async function loadMe() {
+  const r = await fetch("/api/student/me");
+  const data = await r.json();
+  const u = data.user;
+
+  document.getElementById("userCard").innerHTML = `
+    <div style="font-size:14px;line-height:1.6;">
+      <b>Name:</b> ${u.name}<br>
+      <b>XP:</b> ${u.xp}<br>
+      <b>Level:</b> ${u.level_name || "—"} (ab ${u.level_min_xp})
+    </div>
+  `;
+
+  const avatar = document.getElementById("sidebarAvatar");
+  const initials = document.getElementById("sidebarInitials");
+
+  if (data.character && data.character.image_url) {
+    avatar.src = data.character.image_url;
+    avatar.style.display = "block";
+    initials.style.display = "none";
+  } else {
+    avatar.style.display = "none";
+    initials.style.display = "block";
+    initials.textContent = u.name
+      .split(" ")
+      .map(x => x[0])
+      .join("")
+      .toUpperCase();
+  }
+
+  if (data.character) {
+    document.getElementById("characterInfo").innerHTML = `
+      <img class="char-img" src="${data.character.image_url}">
+      <div class="char-name">${data.character.name}</div>
+    `;
+  }
+
+  document.getElementById("traitsItemsCard").innerHTML = `
+    <b>Eigenschaften:</b><br>
+    ${data.traits.map(t => "• "+t).join("<br>")}<br><br>
+    <b>Items:</b><br>
+    ${data.items.map(i => "• "+i).join("<br>")}
+  `;
+
+  xpPerMission = data.xp_per_mission || {};
+  const xpDiv = document.getElementById("xpLog");
+  xpDiv.innerHTML = "";
+
+  data.xp_log.forEach(e => {
+    const d = new Date(e.created_at).toLocaleString("de-DE");
+    xpDiv.innerHTML += `
+      <div class="xp-entry">
+        <b>${e.amount} XP</b> – ${e.mission_name || e.source}<br>
+        <span style="opacity:0.7;">${d}</span>
+      </div>`;
+  });
+
+  renderLevelBar(data.levels, u.xp);
+
+  if (!data.character) {
+    openCharacterOverlay();
+  }
+
+  hideLoader();
+}
+
+
+/* ============================================
+   LEVEL BAR
+============================================ */
+function renderLevelBar(levels, xp) {
+  let html = `<div class="level-step-container">`;
+
+  for (let i = 0; i < levels.length; i++) {
+
+    if (i > 0) html += `<div class="level-step-star">★</div>`;
+
+    const min = levels[i].min_xp;
+    const next = levels[i+1]?.min_xp || min;
+    let pct = xp >= min ? Math.min(100, ((xp - min)/(next - min))*100) : 0;
+
+    html += `
+      <div class="level-step">
+        <div class="level-step-fill" style="width:${pct}%"></div>
+      </div>`;
+  }
+
+  html += `</div>`;
+  document.getElementById("levelBar").innerHTML = html;
+}
+
+
+/* ============================================
+   MISSIONS + REWARDS
+============================================ */
+async function loadMissions() {
+  const r = await fetch("/api/student/missions");
+  renderCarousel("missionCarousel", await r.json(), "mission");
+}
+
+async function loadRewards() {
+  const r = await fetch("/api/student/rewards");
+  renderCarousel("rewardCarousel", await r.json(), "reward");
+}
+
+
+/* ============================================
+   CAROUSEL
+============================================ */
+function renderCarousel(id, items, type) {
+  const c = document.getElementById(id);
+
+  if (!items.length) {
+    c.innerHTML = "<i>Keine Einträge.</i>";
+    return;
+  }
+
+  let slides = "";
+  items.forEach((item, idx) => {
+    slides += `
+      <div class="carousel-item ${idx===0?"active":""}">
+        ${item.image_url ? `<img class="mission-img" src="${item.image_url}">` : ""}
+
+        <h3 style="margin:8px 0 2px 0;font-family:'Bebas Neue';letter-spacing:0.14em;text-transform:uppercase;">
+          ${item.name}
+        </h3>
+
+        <div style="font-size:13px;"><b>${item.xp} XP</b></div>
+
+        ${
+          type==="mission"
+            ? `<div style="margin-top:4px;font-size:12px;">Bereits erhalten: <b>${xpPerMission[item.id]||0} XP</b></div>`
+            : ""
+        }
+
+        ${
+          type==="mission" && item.require_upload
+            ? `
+              <div class="file-upload">
+                <input type="file" id="upload_${item.id}" class="file-input" onchange="updateFileLabel(${item.id})">
+                <label for="upload_${item.id}" class="file-label">Beweis hochladen</label>
+                <span id="file-name-${item.id}" class="file-name">Keine Datei ausgewählt</span>
+                <button class="btn-primary" onclick="uploadMission(${item.id})">Upload senden</button>
+              </div>
+            `
+            : ""
+        }
+
+        ${
+          type==="reward"
+            ? `<button class="btn-primary" onclick="redeemReward(${item.id})" style="margin-top:10px;">Belohnung einlösen</button>`
+            : ""
+        }
+      </div>
+    `;
+  });
+
+  let dots = "";
+  items.forEach((_, idx) => {
+    dots += `<div class="dot ${idx===0?"active":""}" onclick="jumpSlide('${id}',${idx})"></div>`;
+  });
+
+  c.innerHTML = `
+    <div class="carousel-wrapper">
+      <span class="carousel-arrow" onclick="prevSlide('${id}')">&#10094;</span>
+      ${slides}
+      <span class="carousel-arrow" onclick="nextSlide('${id}')">&#10095;</span>
+    </div>
+    <div class="dot-container">${dots}</div>
+  `;
+}
+
+function nextSlide(id) {
+  const items = [...document.querySelectorAll(`#${id} .carousel-item`)];
+  let idx = items.findIndex(i => i.classList.contains("active"));
+  items[idx].classList.remove("active");
+  idx = (idx + 1) % items.length;
+  items[idx].classList.add("active");
+  updateDots(id, idx);
+}
+
+function prevSlide(id) {
+  const items = [...document.querySelectorAll(`#${id} .carousel-item`)];
+  let idx = items.findfindIndex(i => i.classList.contains("active"));
+  items[idx].classList.remove("active");
+  idx = (idx - 1 + items.length) % items.length;
+  items[idx].classList.add("active");
+  updateDots(id, idx);
+}
+
+function jumpSlide(id, idx) {
+  const items = [...document.querySelectorAll(`#${id} .carousel-item`)];
+  items.forEach(i => i.classList.remove("active"));
+  items[idx].classList.add("active");
+  updateDots(id, idx);
+}
+
+function updateDots(id, idx) {
+  const dots = [...document.querySelectorAll(`#${id} .dot`)];
+  dots.forEach(d => d.classList.remove("active"));
+  dots[idx].classList.add("active");
+}
+
+
+/* ============================================
+   FILE UPLOAD
+============================================ */
+function updateFileLabel(id) {
+  const i = document.getElementById(`upload_${id}`);
+  const s = document.getElementById(`file-name-${id}`);
+  s.textContent = i.files.length ? i.files[0].name : "Keine Datei ausgewählt";
+}
+
+async function uploadMission(id) {
+  const input = document.getElementById(`upload_${id}`);
+  if (!input.files.length) {
+    return alert("Bitte Datei auswählen.");
+  }
+
+  const form = new FormData();
+  form.append("image", input.files[0]);
+  form.append("missionId", id);
+
+  const r = await fetch("/api/student/uploadForMission", {
+    method: "POST",
+    body: form
+  });
+  const data = await r.json();
+
+  if (data.success) {
+    alert("Upload erfolgreich!");
+    loadMe();
+  } else {
+    alert("Upload fehlgeschlagen.");
+  }
+}
+
+
+/* ============================================
+   REWARD REDEEM
+============================================ */
+async function redeemReward(id) {
+  const r = await fetch("/api/student/redeemReward", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ rewardId:id })
+  });
+
+  const data = await r.json();
+
+  if (data.success) {
+    alert("Belohnung eingelöst!");
+    loadMe();
+    loadRewards();
+  } else {
+    alert(data.message || "Fehler beim Einlösen.");
+  }
+}
+
+
+/* ============================================
+   KLASSEN-CHALLENGE (Voting + Progress)
+============================================ */
+async function loadClassProgress() {
+  const box = document.getElementById("classChallenge");
+  if (!box) return;
+  box.innerHTML = "<i>Lädt Klassen-Challenge …</i>";
+
+  try {
+    const r = await fetch("/api/student/classProgress");
+    const data = await r.json();
+
+    if (!data.success) {
+      box.innerHTML = `<i>${data.message || "Keine Challenge-Daten verfügbar."}</i>`;
+      return;
+    }
+
+    const cls    = data.class;
+    const round  = data.round;
+    const options = data.options || [];
+    const votes   = data.votes   || [];
+    const myVote  = data.myVote;
+
+    if (!round || !options.length) {
+      box.innerHTML = `
+        <div style="font-size:13px;">
+          <b>Klasse ${cls.name}</b><br>
+          Aktuelle Klassen-XP: <b>${cls.total_xp}</b><br><br>
+          <i>Für deine Klasse läuft gerade keine Challenge.</i>
+        </div>
+      `;
+      return;
+    }
+
+    let statusText = "";
+    if (round.status === "voting") {
+      statusText = "Voting läuft – stimme für eure nächste Klassen-Belohnung ab!";
+    } else if (round.status === "active") {
+      statusText = "Aktive Klassen-Belohnung – eure XP arbeiten auf dieses Ziel hin.";
+    } else if (round.status === "completed") {
+      statusText = "Letzte Klassen-Challenge ist abgeschlossen.";
+    } else {
+      statusText = `Status: ${round.status}`;
+    }
+
+    const voteMap = {};
+    votes.forEach(v => {
+      voteMap[v.reward_id] = v.votes;
+    });
+
+    const selectedRewardId = round.selected_reward_id;
+    const xpRequiredForActive = round.xp_required;
+
+    let cardsHtml = `
+      <div style="font-size:13px;margin-bottom:10px;">
+        <b>Klasse:</b> ${cls.name}<br>
+        <b>Klassen-XP gesamt:</b> ${cls.total_xp}<br>
+        <span style="opacity:0.8;">${statusText}</span>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:8px;">
+    `;
+
+    options.forEach(opt => {
+      const rewardId  = opt.reward_id;
+      const votesFor  = voteMap[rewardId] || 0;
+      const isMy      = myVote === rewardId;
+      const isActive  = selectedRewardId === rewardId && (round.status === "active" || round.status === "completed");
+
+      let progressBar = "";
+      if (isActive && xpRequiredForActive > 0) {
+        const pct = Math.min(100, Math.round((cls.total_xp / xpRequiredForActive) * 100));
+        progressBar = `
+          <div style="margin-top:6px;">
+            <div style="font-size:11px;">Fortschritt zum Klassenziel: <b>${pct}%</b></div>
+            <div style="width:100%;height:10px;border-radius:999px;background:#020617;border:1px solid rgba(148,163,184,0.7);overflow:hidden;">
+              <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#22c55e,#facc15,#f97316);"></div>
+            </div>
+          </div>
+        `;
+      }
+
+      let voteBtn = "";
+      if (round.status === "voting") {
+        const disabled = isMy ? "disabled" : "";
+        const label = isMy ? "Deine Stimme" : "Für diese Belohnung stimmen";
+        voteBtn = `
+          <button
+            class="btn-primary"
+            style="margin-top:8px;padding:6px 10px;font-size:11px;"
+            onclick="voteClassReward(${round.id},${rewardId})"
+            ${disabled}
+          >
+            ${label}
+          </button>
+        `;
+      }
+
+      const badgeMy = isMy
+        ? `<div style="margin-top:4px;font-size:10px;padding:2px 8px;border-radius:999px;border:1px solid #22c55e;background:rgba(34,197,94,0.15);color:#bbf7d0;display:inline-block;">Deine Wahl</div>`
+        : "";
+
+      const badgeActive = isActive
+        ? `<div style="margin-top:4px;font-size:10px;padding:2px 8px;border-radius:999px;border:1px solid #facc15;background:rgba(250,204,21,0.15);color:#fef9c3;display:inline-block;">Aktive Belohnung</div>`
+        : "";
+
+      cardsHtml += `
+        <div style="
+          width:230px;
+          border-radius:16px;
+          background:radial-gradient(circle at top left,#020617 0,#0b1120 60%,#020617 100%);
+          border:1px solid rgba(75,85,99,0.65);
+          box-shadow:0 4px 12px rgba(0,0,0,0.9);
+          padding:10px 12px 12px 12px;
+          font-size:13px;
+        ">
+          ${opt.image_url ? `<img src="${opt.image_url}" alt="${opt.name}" style="width:100%;height:130px;object-fit:cover;border-radius:14px;margin-bottom:6px;box-shadow:0 0 0 3px #020617,0 0 0 4px #f97316,0 0 18px rgba(249,115,22,0.8);">` : ""}
+          <div style="font-weight:600;margin-bottom:2px;">${opt.name}</div>
+          <div style="font-size:12px;">Benötigte XP: <b>${opt.xp_required}</b></div>
+          <div style="font-size:11px;margin-top:2px;opacity:0.85;">Stimmen in deiner Klasse: <b>${votesFor}</b></div>
+          ${progressBar}
+          ${voteBtn}
+          <div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap;">
+            ${badgeMy}
+            ${badgeActive}
+          </div>
+        </div>
+      `;
+    });
+
+    cardsHtml += `</div>`;
+    box.innerHTML = cardsHtml;
+
+  } catch (err) {
+    console.error(err);
+    box.innerHTML = "<i>Fehler beim Laden der Klassen-Challenge.</i>";
+  }
+}
+
+async function voteClassReward(roundId, rewardId) {
+  try {
+    const r = await fetch("/api/student/classVote", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({ roundId, rewardId })
+    });
+    const data = await r.json();
+    if (!data.success) {
+      alert(data.message || "Fehler bei der Abstimmung.");
+      return;
+    }
+    alert("Deine Stimme wurde gespeichert.");
+    await loadClassProgress();
+  } catch (err) {
+    console.error(err);
+    alert("Technischer Fehler bei der Abstimmung.");
+  }
+}
+
+
+/* ============================================
+   INIT
+============================================ */
+loadMe();
+loadMissions();
+loadRewards();
+loadClassProgress();
+</script>
+
+</body>
+</html>
